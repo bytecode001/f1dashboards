@@ -110,7 +110,7 @@ header {
     padding: 0 2rem;
     height: 100%;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
 }
 
@@ -138,38 +138,26 @@ header {
     width: 100%;
 }
 
-nav ul {
-    list-style: none;
-    display: flex;
-    gap: 2rem;
+/* Hero Section */
+.hero-section {
+    text-align: center;
+    margin-bottom: 3rem;
+    animation: slideIn 0.5s ease-out;
 }
 
-nav a {
+.hero-section h1 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 2.5rem;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.hero-section p {
+    font-size: 1.125rem;
     color: var(--text-secondary);
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s;
-    position: relative;
-    padding: 0.5rem 0;
-}
-
-nav a:hover {
-    color: var(--accent);
-}
-
-nav a::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background-color: var(--accent);
-    transition: width 0.3s;
-}
-
-nav a:hover::after {
-    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.8;
 }
 
 /* Main Container */
@@ -430,6 +418,10 @@ select:focus {
 }
 
 /* Statistics Section */
+.stats-container {
+    margin-bottom: 2rem;
+}
+
 .stats-container h3 {
     font-family: 'Russo One', sans-serif;
     font-size: 1.25rem;
@@ -438,7 +430,7 @@ select:focus {
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 1.5rem;
 }
 
@@ -533,7 +525,6 @@ footer {
 
 @media (max-width: 768px) {
     .header-container {
-        flex-direction: column;
         padding: 1rem;
     }
     
@@ -543,11 +534,15 @@ footer {
     
     .logo {
         font-size: 1.5rem;
-        margin-bottom: 1rem;
     }
     
-    nav ul {
-        gap: 1rem;
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+    
+    .hero-section p {
+        font-size: 1rem;
+        padding: 0 1rem;
     }
     
     .main-container {
@@ -572,6 +567,11 @@ footer {
     
     .stats-grid {
         grid-template-columns: 1fr;
+    }
+    
+    .footer-content {
+        padding: 0 1rem;
+        font-size: 0.75rem;
     }
 }
 

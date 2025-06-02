@@ -31,18 +31,17 @@
     <!-- Header -->
     <header>
         <div class="header-container">
-            <a href="#" class="logo">F1 Dashboards</a>
-            <nav>
-                <ul>
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#">About</a></li>
-                </ul>
-            </nav>
+            <a href="https://f1dashboards.com/" target="_blank" class="logo">F1 Dashboards</a>
         </div>
     </header>
     
     <!-- Main Content -->
     <main class="main-container">
+        <!-- Title and Description -->
+        <div class="hero-section">
+            <h1>Constructor Standings Dashboard</h1>
+            <p>Explore and analyze Formula 1 constructor championship standings from 1958 to 2024. The Constructors' Championship was introduced in 1958, making it a vital part of F1 history. Select a season to view the final standings, compare team performances throughout the year, and discover key statistics about each championship season.</p>
+        </div>
         <!-- Season Selector -->
         <div class="season-selector">
             <h2>Select Season</h2>
@@ -50,6 +49,29 @@
                 <select id="seasonSelect">
                     <option value="">Loading seasons...</option>
                 </select>
+            </div>
+        </div>
+        
+        <!-- Statistics Section (moved up) -->
+        <div class="stats-container">
+            <h3>Season Statistics</h3>
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <h4>Total Races</h4>
+                    <p class="stat-value" id="totalRaces">-</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Participating Teams</h4>
+                    <p class="stat-value" id="totalTeams">-</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Constructors' Champion</h4>
+                    <p class="stat-value" id="constructorChampion">-</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Drivers' Champion</h4>
+                    <p class="stat-value" id="driverChampion">-</p>
+                </div>
             </div>
         </div>
         
@@ -104,36 +126,14 @@
             </div>
             <div id="plotly-chart"></div>
         </div>
-        
-        <!-- Statistics Section -->
-        <div class="stats-container">
-            <h3>Season Statistics</h3>
-            <div class="stats-grid" id="statsGrid">
-                <div class="stat-card">
-                    <h4>Total Races</h4>
-                    <p class="stat-value" id="totalRaces">-</p>
-                </div>
-                <div class="stat-card">
-                    <h4>Participating Teams</h4>
-                    <p class="stat-value" id="totalTeams">-</p>
-                </div>
-                <div class="stat-card">
-                    <h4>Season Winner</h4>
-                    <p class="stat-value" id="seasonWinner">-</p>
-                </div>
-                <div class="stat-card">
-                    <h4>Most Wins</h4>
-                    <p class="stat-value" id="mostWins">-</p>
-                </div>
-            </div>
-        </div>
     </main>
     
     <!-- Footer -->
     <footer>
         <div class="footer-content">
-            <p>&copy; 2024 F1 Dashboards. Data provided by <a href="#">F1 Open Data</a></p>
-            <p>Built with ❤️ for Formula 1 fans</p>
+            <p>Powered by <a href="https://plotly.com/javascript/" target="_blank">Plotly.js</a> • Visualization by <a href="#" target="_blank">Francesco Saviano</a></p>
+            <p>Data © <a href="https://www.kaggle.com/rohanrao" target="_blank">Rohan Rao</a> (<a href="https://www.kaggle.com/datasets/rohanrao/formula-1-world-championship-1950-2020" target="_blank">Kaggle: vopani</a>) – Based on the <a href="http://ergast.com/mrd/" target="_blank">Ergast Developer API</a></p>
+            <p>© 2025 F1Dashboards.com. Made with ❤️ for F1 fans.</p>
         </div>
     </footer>
     

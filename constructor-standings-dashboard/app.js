@@ -8,10 +8,13 @@
 
 // Global variables to store data
 let constructorsMap = {};        // Map of constructorId -> constructor info
+let driversMap = {};            // Map of driverId -> driver info
 let raceYearMap = {};           // Map of raceId -> year
 let raceDetailsMap = {};        // Map of raceId -> race details
 let standingsByRace = {};       // Raw standings data by raceId
+let driverStandingsByRace = {}; // Raw driver standings data by raceId
 let processedData = {};         // Processed data by year
+let processedDriverData = {};   // Processed driver data by year
 let selectedTeams = new Set();  // Currently selected teams for chart
 let allYears = [];              // All available years
 
@@ -19,9 +22,10 @@ let allYears = [];              // All available years
 const DATA_PATH = 'data/';
 const CSV_FILES = {
     constructors: 'constructors.csv',
+    drivers: 'drivers.csv',
     races: 'races.csv',
     constructorStandings: 'constructor_standings.csv',
-    seasons: 'seasons.csv'
+    driverStandings: 'driver_standings.csv'
 };
 
 /**
@@ -56,6 +60,15 @@ async function loadAllData() {
             skipEmptyLines: true
         });
         
+        // Load drivers data
+        const driversResponse = await fetch(`${DATA_PATH}${CSV_FILES.drivers}`);
+        const driversCSV = await driversResponse.text();
+        const driversData = Papa.parse(driversCSV, {
+            header: true,
+            dynamicTyping: true,
+            skipEmptyLines: true
+        });
+        
         // Load races data
         const racesResponse = await fetch(`${DATA_PATH}${CSV_FILES.races}`);
         const racesCSV = await racesResponse.text();
@@ -74,10 +87,10 @@ async function loadAllData() {
             skipEmptyLines: true
         });
         
-        // Load seasons data (optional - for additional info)
-        const seasonsResponse = await fetch(`${DATA_PATH}${CSV_FILES.seasons}`);
-        const seasonsCSV = await seasonsResponse.text();
-        const seasonsData = Papa.parse(seasonsCSV, {
+        // Load driver standings data
+        const driverStandingsResponse = await fetch(`${DATA_PATH}${CSV_FILES.driverStandings}`);
+        const driverStandingsCSV = await driverStandingsResponse.text();
+        const driverStandingsData = Papa.parse(driverStandingsCSV, {
             header: true,
             dynamicTyping: true,
             skipEmptyLines: true
@@ -87,17 +100,25 @@ async function loadAllData() {
         if (constructorsData.errors.length > 0) {
             console.warn('Constructors CSV parsing warnings:', constructorsData.errors);
         }
+        if (driversData.errors.length > 0) {
+            console.warn('Drivers CSV parsing warnings:', driversData.errors);
+        }
         if (racesData.errors.length > 0) {
             console.warn('Races CSV parsing warnings:', racesData.errors);
         }
         if (standingsData.errors.length > 0) {
             console.warn('Standings CSV parsing warnings:', standingsData.errors);
         }
+        if (driverStandingsData.errors.length > 0) {
+            console.warn('Driver Standings CSV parsing warnings:', driverStandingsData.errors);
+        }
         
         // Process the loaded data
         processConstructorsData(constructorsData.data);
+        processDriversData(driversData.data);
         processRacesData(racesData.data);
         processStandingsData(standingsData.data);
+        processDriverStandingsData(driverStandingsData.data);
         
         console.log(`Loaded data for ${allYears.length} years (${allYears[0]} - ${allYears[allYears.length - 1]})`);
         
@@ -124,6 +145,73 @@ function processConstructorsData(data) {
 }
 
 /**
+ * Process drivers data into a map
+ */
+function processDriversData(data) {
+    data.forEach(driver => {
+        driversMap[driver.driverId] = {
+            id: driver.driverId,
+            ref: driver.driverRef,
+            number: driver.number,
+            code: driver.code,
+            forename: driver.forename,
+            surname: driver.surname,
+            fullName: `${driver.forename} ${driver.surname}`,
+            dob: driver.dob,
+            nationality: driver.nationality,
+            url: driver.url
+        };
+    });
+    console.log(`Processed ${Object.keys(driversMap).length} drivers`);
+}
+
+/**
+ * Process driver standings data
+ */
+function processDriverStandingsData(data) {
+    // Store all driver standings by race
+    data.forEach(standing => {
+        if (!driverStandingsByRace[standing.raceId]) {
+            driverStandingsByRace[standing.raceId] = [];
+        }
+        driverStandingsByRace[standing.raceId].push(standing);
+    });
+    
+    // Aggregate by year for final standings
+    const racesByYear = {};
+    
+    // Group races by year
+    Object.keys(raceYearMap).forEach(raceId => {
+        const year = raceYearMap[raceId];
+        if (!racesByYear[year]) {
+            racesByYear[year] = [];
+        }
+        racesByYear[year].push(parseInt(raceId));
+    });
+    
+    // For each year, find the last race and get driver standings
+    Object.keys(racesByYear).forEach(year => {
+        const yearRaces = racesByYear[year].sort((a, b) => b - a);
+        const lastRaceId = yearRaces[0];
+        
+        if (driverStandingsByRace[lastRaceId]) {
+            processedDriverData[year] = {};
+            
+            driverStandingsByRace[lastRaceId].forEach(standing => {
+                processedDriverData[year][standing.driverId] = {
+                    driverId: standing.driverId,
+                    points: standing.points || 0,
+                    wins: standing.wins || 0,
+                    position: standing.position || 999
+                };
+            });
+        }
+    });
+    
+    console.log(`Processed driver standings for ${Object.keys(processedDriverData).length} years`);
+}
+
+/**
  * Process races data to create year mapping
  */
 function processRacesData(data) {
@@ -136,7 +224,10 @@ function processRacesData(data) {
             date: race.date,
             round: race.round
         };
-        yearSet.add(race.year);
+        // Only include years from 1958 onwards (first Constructors' Championship)
+        if (race.year >= 1958) {
+            yearSet.add(race.year);
+        }
     });
     
     allYears = Array.from(yearSet).sort((a, b) => b - a);
@@ -358,14 +449,16 @@ function updateTeamCheckboxes(year) {
  */
 function updateStatistics(year) {
     const yearData = processedData[year];
+    const driverYearData = processedDriverData[year];
+    
     if (!yearData) return;
     
     // Calculate statistics
     const teams = Object.entries(yearData);
     const totalTeams = teams.length;
     
-    // Find season winner
-    const winner = teams
+    // Find constructor champion
+    const constructorChampion = teams
         .map(([constructorId, data]) => ({
             ...data,
             constructor: constructorsMap[constructorId]
@@ -373,16 +466,7 @@ function updateStatistics(year) {
         .filter(item => item.constructor)
         .sort((a, b) => b.points - a.points)[0];
     
-    // Find team with most wins
-    const mostWinsTeam = teams
-        .map(([constructorId, data]) => ({
-            ...data,
-            constructor: constructorsMap[constructorId]
-        }))
-        .filter(item => item.constructor)
-        .sort((a, b) => b.wins - a.wins)[0];
-    
-    // Count total races (approximate based on maximum race number)
+    // Count total races
     const totalRaces = Object.keys(raceYearMap)
         .filter(raceId => raceYearMap[raceId] == year)
         .length;
@@ -390,9 +474,106 @@ function updateStatistics(year) {
     // Update UI
     document.getElementById('totalRaces').textContent = totalRaces || 'N/A';
     document.getElementById('totalTeams').textContent = totalTeams;
-    document.getElementById('seasonWinner').textContent = winner?.constructor.name || 'N/A';
-    document.getElementById('mostWins').textContent = 
-        mostWinsTeam ? `${mostWinsTeam.constructor.name} (${mostWinsTeam.wins})` : 'N/A';
+    document.getElementById('constructorChampion').textContent = constructorChampion?.constructor.name || 'N/A';
+    
+    // Find driver champion from actual data
+    if (driverYearData) {
+        const driverChampion = Object.entries(driverYearData)
+            .map(([driverId, data]) => ({
+                ...data,
+                driver: driversMap[driverId]
+            }))
+            .filter(item => item.driver)
+            .sort((a, b) => b.points - a.points)[0];
+        
+        if (driverChampion) {
+            const championText = `${driverChampion.driver.fullName} (${driverChampion.points} pts)`;
+            document.getElementById('driverChampion').textContent = championText;
+        } else {
+            document.getElementById('driverChampion').textContent = 'N/A';
+        }
+    } else {
+        // Fallback to hardcoded data for years without driver standings
+        const driverChampions = {
+            2024: 'Max Verstappen',
+            2023: 'Max Verstappen',
+            2022: 'Max Verstappen',
+            2021: 'Max Verstappen',
+            2020: 'Lewis Hamilton',
+            2019: 'Lewis Hamilton',
+            2018: 'Lewis Hamilton',
+            2017: 'Lewis Hamilton',
+            2016: 'Nico Rosberg',
+            2015: 'Lewis Hamilton',
+            2014: 'Lewis Hamilton',
+            2013: 'Sebastian Vettel',
+            2012: 'Sebastian Vettel',
+            2011: 'Sebastian Vettel',
+            2010: 'Sebastian Vettel',
+            2009: 'Jenson Button',
+            2008: 'Lewis Hamilton',
+            2007: 'Kimi Räikkönen',
+            2006: 'Fernando Alonso',
+            2005: 'Fernando Alonso',
+            2004: 'Michael Schumacher',
+            2003: 'Michael Schumacher',
+            2002: 'Michael Schumacher',
+            2001: 'Michael Schumacher',
+            2000: 'Michael Schumacher',
+            1999: 'Mika Häkkinen',
+            1998: 'Mika Häkkinen',
+            1997: 'Jacques Villeneuve',
+            1996: 'Damon Hill',
+            1995: 'Michael Schumacher',
+            1994: 'Michael Schumacher',
+            1993: 'Alain Prost',
+            1992: 'Nigel Mansell',
+            1991: 'Ayrton Senna',
+            1990: 'Ayrton Senna',
+            1989: 'Alain Prost',
+            1988: 'Ayrton Senna',
+            1987: 'Nelson Piquet',
+            1986: 'Alain Prost',
+            1985: 'Alain Prost',
+            1984: 'Niki Lauda',
+            1983: 'Nelson Piquet',
+            1982: 'Keke Rosberg',
+            1981: 'Nelson Piquet',
+            1980: 'Alan Jones',
+            1979: 'Jody Scheckter',
+            1978: 'Mario Andretti',
+            1977: 'Niki Lauda',
+            1976: 'James Hunt',
+            1975: 'Niki Lauda',
+            1974: 'Emerson Fittipaldi',
+            1973: 'Jackie Stewart',
+            1972: 'Emerson Fittipaldi',
+            1971: 'Jackie Stewart',
+            1970: 'Jochen Rindt',
+            1969: 'Jackie Stewart',
+            1968: 'Graham Hill',
+            1967: 'Denny Hulme',
+            1966: 'Jack Brabham',
+            1965: 'Jim Clark',
+            1964: 'John Surtees',
+            1963: 'Jim Clark',
+            1962: 'Graham Hill',
+            1961: 'Phil Hill',
+            1960: 'Jack Brabham',
+            1959: 'Jack Brabham',
+            1958: 'Mike Hawthorn',
+            1957: 'Juan Manuel Fangio',
+            1956: 'Juan Manuel Fangio',
+            1955: 'Juan Manuel Fangio',
+            1954: 'Juan Manuel Fangio',
+            1953: 'Alberto Ascari',
+            1952: 'Alberto Ascari',
+            1951: 'Juan Manuel Fangio',
+            1950: 'Nino Farina'
+        };
+        
+        document.getElementById('driverChampion').textContent = driverChampions[year] || 'N/A';
+    }
 }
 
 /**
