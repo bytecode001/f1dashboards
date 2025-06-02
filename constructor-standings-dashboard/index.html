@@ -1,1 +1,143 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 Constructor Standings Dashboard</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Plotly.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.27.0/plotly.min.js"></script>
+    
+    <!-- PapaParse for CSV parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loader" id="loader">
+        <div class="loader-content">
+            <div class="loader-circle"></div>
+            <p class="loader-text">Loading F1 Data...</p>
+        </div>
+    </div>
+    
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <a href="#" class="logo">F1 Dashboards</a>
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">About</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Season Selector -->
+        <div class="season-selector">
+            <h2>Select Season</h2>
+            <div class="select-wrapper">
+                <select id="seasonSelect">
+                    <option value="">Loading seasons...</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Grid Layout: Standings Table and Team Selector -->
+        <div class="grid-container">
+            <!-- Standings Table -->
+            <div class="standings-card">
+                <h3>Constructor Standings <span id="selectedYear"></span></h3>
+                <div class="table-wrapper">
+                    <table class="standings-table">
+                        <thead>
+                            <tr>
+                                <th>Pos</th>
+                                <th>Constructor</th>
+                                <th>Points</th>
+                                <th>Wins</th>
+                            </tr>
+                        </thead>
+                        <tbody id="standingsTableBody">
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                                    Select a season to view standings
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Team Selector -->
+            <div class="team-selector">
+                <h3>Select Constructors to Compare</h3>
+                <div class="team-controls">
+                    <button id="selectAllBtn" class="control-btn">Select All</button>
+                    <button id="clearAllBtn" class="control-btn">Clear All</button>
+                </div>
+                <div class="team-checkboxes" id="teamCheckboxes">
+                    <p style="color: var(--text-secondary);">Loading constructors...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chart Section -->
+        <div class="chart-container">
+            <h3>Constructor Points Progress Over Time</h3>
+            <div class="chart-controls">
+                <label for="chartType">Chart Type:</label>
+                <select id="chartType">
+                    <option value="line">Line Chart</option>
+                    <option value="area">Area Chart</option>
+                </select>
+            </div>
+            <div id="plotly-chart"></div>
+        </div>
+        
+        <!-- Statistics Section -->
+        <div class="stats-container">
+            <h3>Season Statistics</h3>
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <h4>Total Races</h4>
+                    <p class="stat-value" id="totalRaces">-</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Participating Teams</h4>
+                    <p class="stat-value" id="totalTeams">-</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Season Winner</h4>
+                    <p class="stat-value" id="seasonWinner">-</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Most Wins</h4>
+                    <p class="stat-value" id="mostWins">-</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2024 F1 Dashboards. Data provided by <a href="#">F1 Open Data</a></p>
+            <p>Built with ❤️ for Formula 1 fans</p>
+        </div>
+    </footer>
+    
+    <!-- Custom JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>
