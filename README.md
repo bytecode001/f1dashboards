@@ -56,13 +56,13 @@ Additional dashboards (planned):
 
 ## 📂 Repository Structure
 
-`
+```
 /data/          # CSV data files (e.g. constructor_standings.csv, drivers.csv, etc.)
 app.js          # Main JavaScript logic for dashboards
 index.html      # Landing page / main dashboard HTML
 styles.css      # Main stylesheet for layout and design
 README.md       # Project documentation
-`
+```
 
 
 ---
