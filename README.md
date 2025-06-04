@@ -56,3 +56,48 @@ Additional dashboards (planned):
 
 ## 📂 Repository Structure
 
+/data/          # CSV data files (e.g. constructor_standings.csv, drivers.csv, etc.)
+app.js          # Main JavaScript logic for dashboards
+index.html      # Landing page / main dashboard HTML
+styles.css      # Main stylesheet for layout and design
+README.md       # Project documentation
+
+
+
+---
+
+## 📝 Credits & License
+
+- Data: [Kaggle F1 Dataset](https://www.kaggle.com/datasets), Ergast API, Wikipedia (for post-2024 manual updates)
+- Logo & graphics: by Francesco Saviano 
+- Dashboard code: MIT License 
+- This site is an independent, non-commercial project not affiliated with Formula 1 Group.
+
+---
+
+## ☕ Support
+
+If you enjoy the project, you can [buy me a coffee on Ko-fi](https://ko-fi.com/f1dashboards) (replace with your Ko-fi link)!  
+Your support helps keep F1Dashboards free, open, and ad-free.
+
+---
+
+## 📬 Contact & Feedback
+
+- Suggestions, bug reports or contributions?  
+  Open an issue or contact: [f1dashboards25@gmail.com]
+
+---
+
+## 🚧 Roadmap / To Do
+
+- Add Drivers Career and Race Results dashboards
+- Explore integration with Jolpica API for future data updates
+- Expand dashboard analytics (qualifying, pit stops, circuits)
+- Enhance mobile experience
+- Add language support (EN/IT)
+
+---
+
+**F1Dashboards — Formula 1 data, visualized for everyone.**
+
