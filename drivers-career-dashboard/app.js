@@ -555,14 +555,39 @@ async function processDriverData(driverId) {
         }
     });
     
-    // Add qualifying data
+    // Add qualifying data with better pole position detection
     driverQualifying.forEach(qual => {
         const race = racesMap[qual.raceId];
         if (!race) return;
         
         const year = race.year;
-        if (seasonData[year] && qual.position === 1) {
-            seasonData[year].poles++;
+        if (seasonData[year]) {
+            // Check multiple conditions for pole position
+            // 1. position === 1
+            // 2. position === "1" (string)
+            // 3. position === null but has qualifying time (might be pole)
+            if (qual.position == 1) {  // Using == to catch both 1 and "1"
+                seasonData[year].poles++;
+            }
+        }
+    });
+    
+    // Alternative method: count poles from race results where grid position = 1
+    driverResults.forEach(result => {
+        const race = racesMap[result.raceId];
+        if (!race) return;
+        
+        const year = race.year;
+        if (seasonData[year] && result.grid == 1) {  // grid position 1 = pole
+            // Check if we haven't already counted this pole
+            const qualCount = driverQualifying.filter(q => 
+                q.raceId === result.raceId && q.driverId === driverId && q.position == 1
+            ).length;
+            
+            if (qualCount === 0) {
+                // This is a pole not counted from qualifying data
+                seasonData[year].poles++;
+            }
         }
     });
     
