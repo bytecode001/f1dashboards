@@ -377,37 +377,11 @@ function setupDriverSearch() {
         }
     });
     
-    // Focus handler - show popular drivers when clicking empty field
+    // Focus handler - show suggestions based on current filter
     searchInput.addEventListener('focus', (e) => {
         if (!e.target.value && !isListOpen) {
-            // Show recent champions
-            const recentChampions = driversList
-                .filter(d => d.championYears.some(y => y >= 2000))
-                .sort((a, b) => Math.max(...b.championYears) - Math.max(...a.championYears))
-                .slice(0, 5);
-            
-            if (recentChampions.length > 0) {
-                const headerHtml = '<div class="results-header">Recent Champions</div>';
-                const driversHtml = recentChampions.map(driver => {
-                    const initials = driver.forename.charAt(0) + driver.surname.charAt(0);
-                    return `
-                        <div class="search-result-item" data-driver-id="${driver.id}">
-                            <div class="driver-avatar-small">
-                                <span>${initials}</span>
-                            </div>
-                            <div class="driver-info-small">
-                                <div class="driver-name">${driver.fullName}</div>
-                                <div class="driver-meta">
-                                    <span class="champion-badge">🏆 ${driver.championYears.length}x Champion</span>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                
-                searchResults.innerHTML = headerHtml + driversHtml;
-                searchResults.classList.add('active');
-            }
+            // Show suggestions based on current filter
+            showDriversList(currentFilter);
         }
     });
     
@@ -531,8 +505,31 @@ async function processDriverData(driverId) {
         if (result.position === 1) seasonData[year].wins++;
         if (result.position <= 3 && result.position >= 1) seasonData[year].podiums++;
         
-        // Count DNFs
-        if (result.statusId > 1) seasonData[year].dnfs++;
+        // Count DNFs - only REAL retirements during the race
+        // Based on the debug output:
+        // - statusId 3 (Accident) with position \N = DNF ✓
+        // - statusId 11-19 with valid position = Lapped but finished, NOT DNF ✗
+        // - statusId 31 (Retired) with position 19 = Classified, NOT DNF ✗
+        // - statusId 54 (Withdrew) with position \N = DNF ✓
+        // - statusId 130 with position \N = Probably DNS/DNQ, NOT DNF ✗
+        
+        // A true DNF must have:
+        // 1. No valid finishing position (null, 0, or \N)
+        // 2. A statusId indicating retirement (not lapped, not DNS)
+        
+        const position = result.position;
+        const statusId = parseInt(result.statusId);
+        
+        // Check if driver has no valid finishing position
+        const noValidPosition = !position || position == 0 || position === '\\N' || position === null;
+        
+        // List of statusIds that are true DNFs (when combined with no position)
+        const dnfStatusIds = [2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129];
+        
+        // Count as DNF only if no valid position AND statusId indicates retirement
+        if (noValidPosition && dnfStatusIds.includes(statusId)) {
+            seasonData[year].dnfs++;
+        }
         
         // Add team
         if (constructor) {
@@ -563,10 +560,8 @@ async function processDriverData(driverId) {
         const year = race.year;
         if (seasonData[year]) {
             // Check multiple conditions for pole position
-            // 1. position === 1
-            // 2. position === "1" (string)
-            // 3. position === null but has qualifying time (might be pole)
-            if (qual.position == 1) {  // Using == to catch both 1 and "1"
+            // Using == to catch both 1 and "1"
+            if (qual.position == 1) {
                 seasonData[year].poles++;
             }
         }
@@ -578,8 +573,8 @@ async function processDriverData(driverId) {
         if (!race) return;
         
         const year = race.year;
-        if (seasonData[year] && result.grid == 1) {  // grid position 1 = pole
-            // Check if we haven't already counted this pole
+        if (seasonData[year] && result.grid == 1) {
+            // Check if we haven't already counted this pole from qualifying
             const qualCount = driverQualifying.filter(q => 
                 q.raceId === result.raceId && q.driverId === driverId && q.position == 1
             ).length;
@@ -909,7 +904,6 @@ function updateWinsPodumsChart(data) {
         },
         legend: {
             font: { color: '#ffffff' },
-            bgcolor: 'rgba(21, 21, 30, 0.8)',
             bordercolor: 'rgba(255, 255, 255, 0.1)',
             borderwidth: 1
         }
