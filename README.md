@@ -92,8 +92,7 @@ Your support helps keep F1Dashboards free, open, and ad-free.
 
 ## 🚧 Roadmap / To Do
 
-- Add Drivers Career and Race Results dashboards
-- Explore integration with Jolpica API for future data updates
+- Explore integration with [Jolpica API](https://github.com/jolpica/jolpica-f1) for future data updates
 - Expand dashboard analytics (qualifying, pit stops, circuits)
 - Enhance mobile experience
 - Add language support (EN/IT)
