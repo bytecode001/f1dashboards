@@ -56,12 +56,13 @@ Additional dashboards (planned):
 
 ## 📂 Repository Structure
 
+`
 /data/          # CSV data files (e.g. constructor_standings.csv, drivers.csv, etc.)
 app.js          # Main JavaScript logic for dashboards
 index.html      # Landing page / main dashboard HTML
 styles.css      # Main stylesheet for layout and design
 README.md       # Project documentation
-
+`
 
 
 ---
@@ -77,7 +78,7 @@ README.md       # Project documentation
 
 ## ☕ Support
 
-If you enjoy the project, you can [buy me a coffee on Ko-fi](https://ko-fi.com/f1dashboards) (replace with your Ko-fi link)!  
+If you enjoy the project, you can [buy me a coffee on Ko-fi](https://ko-fi.com/f1dashboards)!  
 Your support helps keep F1Dashboards free, open, and ad-free.
 
 ---
