@@ -17,6 +17,7 @@ let processedData = {};         // Processed data by year
 let processedDriverData = {};   // Processed driver data by year
 let selectedTeams = new Set();  // Currently selected teams for chart
 let allYears = [];              // All available years
+let resultsData = [];           // Raw results data for driver-team relationships
 
 // File paths for CSV data
 const DATA_PATH = 'data/';
@@ -25,7 +26,8 @@ const CSV_FILES = {
     drivers: 'drivers.csv',
     races: 'races.csv',
     constructorStandings: 'constructor_standings.csv',
-    driverStandings: 'driver_standings.csv'
+    driverStandings: 'driver_standings.csv',
+    results: 'results.csv'  // Added results.csv to get driver-team relationships
 };
 
 /**
@@ -95,6 +97,15 @@ async function loadAllData() {
             dynamicTyping: true,
             skipEmptyLines: true
         });
+        
+        // Load results data for driver-team relationships
+        const resultsResponse = await fetch(`${DATA_PATH}${CSV_FILES.results}`);
+        const resultsCSV = await resultsResponse.text();
+        resultsData = Papa.parse(resultsCSV, {
+            header: true,
+            dynamicTyping: true,
+            skipEmptyLines: true
+        }).data;
         
         // Check for parsing errors
         if (constructorsData.errors.length > 0) {
@@ -512,7 +523,43 @@ function updateStatistics(year) {
             .sort((a, b) => b.points - a.points)[0];
         
         if (driverChampion) {
-            const championText = `${driverChampion.driver.fullName} (${driverChampion.points} pts)`;
+            // Find the team for the driver champion by checking results data
+            const championDriverId = driverChampion.driver.id;
+            
+            // Get all races for this year
+            const yearRaceIds = Object.entries(raceYearMap)
+                .filter(([raceId, raceYear]) => raceYear == year)
+                .map(([raceId]) => parseInt(raceId));
+            
+            // Find the constructor for this driver in this year's races
+            const driverResults = resultsData.filter(result => 
+                result.driverId == championDriverId && 
+                yearRaceIds.includes(result.raceId)
+            );
+            
+            // Get the most common constructor (in case of mid-season switch)
+            const constructorCounts = {};
+            driverResults.forEach(result => {
+                if (result.constructorId) {
+                    constructorCounts[result.constructorId] = (constructorCounts[result.constructorId] || 0) + 1;
+                }
+            });
+            
+            // Find the constructor with most races
+            let championConstructorId = null;
+            let maxCount = 0;
+            Object.entries(constructorCounts).forEach(([constructorId, count]) => {
+                if (count > maxCount) {
+                    maxCount = count;
+                    championConstructorId = constructorId;
+                }
+            });
+            
+            const championName = driverChampion.driver.fullName;
+            const team = championConstructorId && constructorsMap[championConstructorId] 
+                ? constructorsMap[championConstructorId].name 
+                : '';
+            const championText = team ? `${championName} (${team})` : championName;
             document.getElementById('driverChampion').textContent = championText;
         } else {
             document.getElementById('driverChampion').textContent = 'N/A';
@@ -520,81 +567,73 @@ function updateStatistics(year) {
     } else {
         // Fallback to hardcoded data for years without driver standings
         const driverChampions = {
-            2024: 'Max Verstappen',
-            2023: 'Max Verstappen',
-            2022: 'Max Verstappen',
-            2021: 'Max Verstappen',
-            2020: 'Lewis Hamilton',
-            2019: 'Lewis Hamilton',
-            2018: 'Lewis Hamilton',
-            2017: 'Lewis Hamilton',
-            2016: 'Nico Rosberg',
-            2015: 'Lewis Hamilton',
-            2014: 'Lewis Hamilton',
-            2013: 'Sebastian Vettel',
-            2012: 'Sebastian Vettel',
-            2011: 'Sebastian Vettel',
-            2010: 'Sebastian Vettel',
-            2009: 'Jenson Button',
-            2008: 'Lewis Hamilton',
-            2007: 'Kimi Räikkönen',
-            2006: 'Fernando Alonso',
-            2005: 'Fernando Alonso',
-            2004: 'Michael Schumacher',
-            2003: 'Michael Schumacher',
-            2002: 'Michael Schumacher',
-            2001: 'Michael Schumacher',
-            2000: 'Michael Schumacher',
-            1999: 'Mika Häkkinen',
-            1998: 'Mika Häkkinen',
-            1997: 'Jacques Villeneuve',
-            1996: 'Damon Hill',
-            1995: 'Michael Schumacher',
-            1994: 'Michael Schumacher',
-            1993: 'Alain Prost',
-            1992: 'Nigel Mansell',
-            1991: 'Ayrton Senna',
-            1990: 'Ayrton Senna',
-            1989: 'Alain Prost',
-            1988: 'Ayrton Senna',
-            1987: 'Nelson Piquet',
-            1986: 'Alain Prost',
-            1985: 'Alain Prost',
-            1984: 'Niki Lauda',
-            1983: 'Nelson Piquet',
-            1982: 'Keke Rosberg',
-            1981: 'Nelson Piquet',
-            1980: 'Alan Jones',
-            1979: 'Jody Scheckter',
-            1978: 'Mario Andretti',
-            1977: 'Niki Lauda',
-            1976: 'James Hunt',
-            1975: 'Niki Lauda',
-            1974: 'Emerson Fittipaldi',
-            1973: 'Jackie Stewart',
-            1972: 'Emerson Fittipaldi',
-            1971: 'Jackie Stewart',
-            1970: 'Jochen Rindt',
-            1969: 'Jackie Stewart',
-            1968: 'Graham Hill',
-            1967: 'Denny Hulme',
-            1966: 'Jack Brabham',
-            1965: 'Jim Clark',
-            1964: 'John Surtees',
-            1963: 'Jim Clark',
-            1962: 'Graham Hill',
-            1961: 'Phil Hill',
-            1960: 'Jack Brabham',
-            1959: 'Jack Brabham',
-            1958: 'Mike Hawthorn',
-            1957: 'Juan Manuel Fangio',
-            1956: 'Juan Manuel Fangio',
-            1955: 'Juan Manuel Fangio',
-            1954: 'Juan Manuel Fangio',
-            1953: 'Alberto Ascari',
-            1952: 'Alberto Ascari',
-            1951: 'Juan Manuel Fangio',
-            1950: 'Nino Farina'
+            2024: 'Max Verstappen (Red Bull)',
+            2023: 'Max Verstappen (Red Bull)',
+            2022: 'Max Verstappen (Red Bull)',
+            2021: 'Max Verstappen (Red Bull)',
+            2020: 'Lewis Hamilton (Mercedes)',
+            2019: 'Lewis Hamilton (Mercedes)',
+            2018: 'Lewis Hamilton (Mercedes)',
+            2017: 'Lewis Hamilton (Mercedes)',
+            2016: 'Nico Rosberg (Mercedes)',
+            2015: 'Lewis Hamilton (Mercedes)',
+            2014: 'Lewis Hamilton (Mercedes)',
+            2013: 'Sebastian Vettel (Red Bull)',
+            2012: 'Sebastian Vettel (Red Bull)',
+            2011: 'Sebastian Vettel (Red Bull)',
+            2010: 'Sebastian Vettel (Red Bull)',
+            2009: 'Jenson Button (Brawn)',
+            2008: 'Lewis Hamilton (McLaren)',
+            2007: 'Kimi Räikkönen (Ferrari)',
+            2006: 'Fernando Alonso (Renault)',
+            2005: 'Fernando Alonso (Renault)',
+            2004: 'Michael Schumacher (Ferrari)',
+            2003: 'Michael Schumacher (Ferrari)',
+            2002: 'Michael Schumacher (Ferrari)',
+            2001: 'Michael Schumacher (Ferrari)',
+            2000: 'Michael Schumacher (Ferrari)',
+            1999: 'Mika Häkkinen (McLaren)',
+            1998: 'Mika Häkkinen (McLaren)',
+            1997: 'Jacques Villeneuve (Williams)',
+            1996: 'Damon Hill (Williams)',
+            1995: 'Michael Schumacher (Benetton)',
+            1994: 'Michael Schumacher (Benetton)',
+            1993: 'Alain Prost (Williams)',
+            1992: 'Nigel Mansell (Williams)',
+            1991: 'Ayrton Senna (McLaren)',
+            1990: 'Ayrton Senna (McLaren)',
+            1989: 'Alain Prost (McLaren)',
+            1988: 'Ayrton Senna (McLaren)',
+            1987: 'Nelson Piquet (Williams)',
+            1986: 'Alain Prost (McLaren)',
+            1985: 'Alain Prost (McLaren)',
+            1984: 'Niki Lauda (McLaren)',
+            1983: 'Nelson Piquet (Brabham)',
+            1982: 'Keke Rosberg (Williams)',
+            1981: 'Nelson Piquet (Brabham)',
+            1980: 'Alan Jones (Williams)',
+            1979: 'Jody Scheckter (Ferrari)',
+            1978: 'Mario Andretti (Lotus)',
+            1977: 'Niki Lauda (Ferrari)',
+            1976: 'James Hunt (McLaren)',
+            1975: 'Niki Lauda (Ferrari)',
+            1974: 'Emerson Fittipaldi (McLaren)',
+            1973: 'Jackie Stewart (Tyrrell)',
+            1972: 'Emerson Fittipaldi (Lotus)',
+            1971: 'Jackie Stewart (Tyrrell)',
+            1970: 'Jochen Rindt (Lotus)',
+            1969: 'Jackie Stewart (Matra)',
+            1968: 'Graham Hill (Lotus)',
+            1967: 'Denny Hulme (Brabham)',
+            1966: 'Jack Brabham (Brabham)',
+            1965: 'Jim Clark (Lotus)',
+            1964: 'John Surtees (Ferrari)',
+            1963: 'Jim Clark (Lotus)',
+            1962: 'Graham Hill (BRM)',
+            1961: 'Phil Hill (Ferrari)',
+            1960: 'Jack Brabham (Cooper)',
+            1959: 'Jack Brabham (Cooper)',
+            1958: 'Mike Hawthorn (Ferrari)'
         };
         
         document.getElementById('driverChampion').textContent = driverChampions[year] || 'N/A';
