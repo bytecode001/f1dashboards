@@ -19,10 +19,10 @@ All dashboards are fully client-side and require no backend, making them fast, l
 Currently live:
 - **Constructor Standings Dashboard**  
   Visualize and compare constructor performance season by season.
-
-Coming soon:
 - **Drivers Career Dashboard**  
   Explore F1 driver careers, season results, wins, podiums, and teams.
+
+Coming soon:
 - **Race Results Explorer**  
   Analyze race-by-race results, filter by circuit, driver, or constructor.
 
