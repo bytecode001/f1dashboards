@@ -1,233 +1,307 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>F1 Drivers Career Dashboard</title>
-    
+
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Plotly.js -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Russo+One&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Plotly.js CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.27.0/plotly.min.js"></script>
-    
-    <!-- PapaParse for CSV parsing -->
+    <script>
+      // If the Plotly CDN fails, load the local version as a fallback
+      if (typeof Plotly === "undefined") {
+        var script = document.createElement("script");
+        script.src = "libs/plotly.min.js";
+        document.head.appendChild(script);
+      }
+    </script>
+
+    <!-- PapaParse CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    
+    <script>
+      // If the PapaParse CDN fails, load the local version as a fallback
+      if (typeof Papa === "undefined") {
+        var script = document.createElement("script");
+        script.src = "libs/papaparse.min.js";
+        document.head.appendChild(script);
+      }
+    </script>
+
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
     <!-- Loading Screen -->
     <div class="loader" id="loader">
-        <div class="loader-content">
-            <div class="loader-circle"></div>
-            <p class="loader-text">Loading F1 Data...</p>
-        </div>
+      <div class="loader-content">
+        <div class="loader-circle"></div>
+        <p class="loader-text">Loading F1 Data...</p>
+      </div>
     </div>
-    
+
     <!-- Header -->
     <header>
-        <div class="header-container">
-            <nav class="nav-menu">
-                <a href="https://f1dashboards.com/" class="home-icon" title="Home">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                    </svg>
-                </a>
-                
-                <div class="nav-links">
-                    <a href="https://f1dashboards.com/dashboards/constructor-standings-dashboard/" class="nav-link">Constructors</a>
-                    <a href="#" class="nav-link active">Drivers</a>
-                    <a href="#" class="nav-link">Races</a>
-                    <a href="#" class="nav-link">Qualifying</a>
-                    <a href="#" class="nav-link">Pit Stop Analysis</a>
-                    <a href="#" class="nav-link">Circuit Insights</a>
-                </div>
-                
-                <button class="mobile-menu-toggle" id="mobileMenuToggle">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-            </nav>
-            
-            <a href="https://f1dashboards.com/" target="_blank" class="logo">F1 Dashboards</a>
-        </div>
+      <div class="header-container">
+        <nav class="nav-menu">
+          <a href="https://f1dashboards.com/" class="home-icon" title="Home">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+          </a>
+
+          <div class="nav-links">
+            <a
+              href="https://f1dashboards.com/dashboards/constructor-standings-dashboard/"
+              class="nav-link"
+              >Constructors</a
+            >
+            <a href="#" class="nav-link active">Drivers</a>
+            <a href="#" class="nav-link">Races</a>
+            <a href="#" class="nav-link">Qualifying</a>
+            <a href="#" class="nav-link">Pit Stop Analysis</a>
+            <a href="#" class="nav-link">Circuit Insights</a>
+          </div>
+
+          <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </nav>
+
+        <a href="https://f1dashboards.com/" target="_blank" class="logo"
+          >F1 Dashboards</a
+        >
+      </div>
     </header>
-    
+
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobileMenu">
-        <div class="mobile-menu-content">
-            <a href="/constructors" class="mobile-menu-link">Constructors</a>
-            <a href="/drivers" class="mobile-menu-link active">Drivers</a>
-            <a href="/races" class="mobile-menu-link">Races</a>
-            <a href="/qualifying" class="mobile-menu-link">Qualifying</a>
-            <a href="/pitstops" class="mobile-menu-link">Pit Stop Analysis</a>
-            <a href="/circuits" class="mobile-menu-link">Circuit Insights</a>
-        </div>
+      <div class="mobile-menu-content">
+        <a href="/constructors" class="mobile-menu-link">Constructors</a>
+        <a href="/drivers" class="mobile-menu-link active">Drivers</a>
+        <a href="/races" class="mobile-menu-link">Races</a>
+        <a href="/qualifying" class="mobile-menu-link">Qualifying</a>
+        <a href="/pitstops" class="mobile-menu-link">Pit Stop Analysis</a>
+        <a href="/circuits" class="mobile-menu-link">Circuit Insights</a>
+      </div>
     </div>
-    
+
     <!-- Main Content -->
     <main class="main-container">
-        <!-- Title and Description -->
-        <div class="hero-section">
-            <h1>Drivers Career Dashboard</h1>
-            <p>Explore the complete career journey of Formula 1 drivers from 1950 to present. Track their progression through teams, analyze performance statistics, and discover career highlights through interactive visualizations.</p>
+      <!-- Title and Description -->
+      <div class="hero-section">
+        <h1>Drivers Career Dashboard</h1>
+        <p>
+          Explore the complete career journey of Formula 1 drivers from 1950 to
+          present. Track their progression through teams, analyze performance
+          statistics, and discover career highlights through interactive
+          visualizations.
+        </p>
+      </div>
+
+      <!-- Driver Selector -->
+      <div class="driver-selector">
+        <h2>Select Driver</h2>
+        <div class="search-wrapper">
+          <input
+            type="text"
+            id="driverSearch"
+            placeholder="Search for a driver or click to see all..."
+            autocomplete="off"
+          />
+          <div class="search-icon">🔍</div>
+          <button
+            class="toggle-list-btn"
+            id="toggleListBtn"
+            title="Show all drivers"
+          >
+            <span class="toggle-icon">▼</span>
+          </button>
+          <div class="search-results" id="searchResults"></div>
         </div>
-        
-        <!-- Driver Selector -->
-        <div class="driver-selector">
-            <h2>Select Driver</h2>
-            <div class="search-wrapper">
-                <input type="text" 
-                       id="driverSearch" 
-                       placeholder="Search for a driver or click to see all..."
-                       autocomplete="off">
-                <div class="search-icon">🔍</div>
-                <button class="toggle-list-btn" id="toggleListBtn" title="Show all drivers">
-                    <span class="toggle-icon">▼</span>
-                </button>
-                <div class="search-results" id="searchResults"></div>
-            </div>
-            <div class="quick-filters" id="quickFilters">
-                <button class="filter-btn active" data-filter="all">All</button>
-                <button class="filter-btn" data-filter="champions">Champions</button>
-                <button class="filter-btn" data-filter="active">Recent (2020+)</button>
-            </div>
+        <div class="quick-filters" id="quickFilters">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="champions">Champions</button>
+          <button class="filter-btn" data-filter="active">
+            Recent (2020+)
+          </button>
         </div>
-        
-        <!-- Driver Profile -->
-        <div class="driver-profile" id="driverProfile" style="display: none;">
-            <div class="profile-header">
-                <div class="driver-avatar">
-                    <div class="avatar-placeholder">
-                        <span id="driverInitials">--</span>
-                    </div>
-                </div>
-                <div class="driver-info">
-                    <h2 id="driverName">--</h2>
-                    <div class="driver-details">
-                        <span class="nationality" id="driverNationality">--</span>
-                        <span class="driver-number" id="driverNumber">--</span>
-                        <span class="driver-code" id="driverCode">--</span>
-                    </div>
-                    <div class="career-span">
-                        <span id="careerSpan">--</span>
-                    </div>
-                </div>
+      </div>
+
+      <!-- Driver Profile -->
+      <div class="driver-profile" id="driverProfile" style="display: none">
+        <div class="profile-header">
+          <div class="driver-avatar">
+            <div class="avatar-placeholder">
+              <span id="driverInitials">--</span>
             </div>
+          </div>
+          <div class="driver-info">
+            <h2 id="driverName">--</h2>
+            <div class="driver-details">
+              <span class="nationality" id="driverNationality">--</span>
+              <span class="driver-number" id="driverNumber">--</span>
+              <span class="driver-code" id="driverCode">--</span>
+            </div>
+            <div class="career-span">
+              <span id="careerSpan">--</span>
+            </div>
+          </div>
         </div>
-        
-        <!-- Career Statistics -->
-        <div class="stats-container" id="careerStats" style="display: none;">
-            <h3>Career Statistics</h3>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <h4>Championships</h4>
-                    <p class="stat-value" id="totalChampionships">0</p>
-                </div>
-                <div class="stat-card">
-                    <h4>Race Wins</h4>
-                    <p class="stat-value" id="totalWins">0</p>
-                </div>
-                <div class="stat-card">
-                    <h4>Podiums</h4>
-                    <p class="stat-value" id="totalPodiums">0</p>
-                </div>
-                <div class="stat-card">
-                    <h4>Pole Positions</h4>
-                    <p class="stat-value" id="totalPoles">0</p>
-                </div>
-                <div class="stat-card">
-                    <h4>Career Points</h4>
-                    <p class="stat-value" id="totalPoints">0</p>
-                </div>
-                <div class="stat-card">
-                    <h4>Races Started</h4>
-                    <p class="stat-value" id="totalRaces">0</p>
-                </div>
-            </div>
+      </div>
+
+      <!-- Career Statistics -->
+      <div class="stats-container" id="careerStats" style="display: none">
+        <h3>Career Statistics</h3>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h4>Championships</h4>
+            <p class="stat-value" id="totalChampionships">0</p>
+          </div>
+          <div class="stat-card">
+            <h4>Race Wins</h4>
+            <p class="stat-value" id="totalWins">0</p>
+          </div>
+          <div class="stat-card">
+            <h4>Podiums</h4>
+            <p class="stat-value" id="totalPodiums">0</p>
+          </div>
+          <div class="stat-card">
+            <h4>Pole Positions</h4>
+            <p class="stat-value" id="totalPoles">0</p>
+          </div>
+          <div class="stat-card">
+            <h4>Career Points</h4>
+            <p class="stat-value" id="totalPoints">0</p>
+          </div>
+          <div class="stat-card">
+            <h4>Races Started</h4>
+            <p class="stat-value" id="totalRaces">0</p>
+          </div>
         </div>
-        
-        <!-- Teams Timeline -->
-        <div class="teams-section" id="teamsSection" style="display: none;">
-            <h3>Teams Timeline</h3>
-            <div class="teams-timeline" id="teamsTimeline">
-                <!-- Teams will be inserted here dynamically -->
-            </div>
+      </div>
+
+      <!-- Teams Timeline -->
+      <div class="teams-section" id="teamsSection" style="display: none">
+        <h3>Teams Timeline</h3>
+        <div class="teams-timeline" id="teamsTimeline">
+          <!-- Teams will be inserted here dynamically -->
         </div>
-        
-        <!-- Charts Section -->
-        <div class="charts-container" id="chartsContainer" style="display: none;">
-            <!-- Points Progress Chart -->
-            <div class="chart-card">
-                <h3>Points Progress by Season</h3>
-                <div id="pointsChart"></div>
-            </div>
-            
-            <!-- Wins and Podiums Chart -->
-            <div class="chart-card">
-                <h3>Wins and Podiums by Season</h3>
-                <div id="winsPodumsChart"></div>
-            </div>
-            
-            <!-- Teams Distribution Chart -->
-            <div class="chart-card half-width">
-                <h3>Races by Team</h3>
-                <div id="teamsChart"></div>
-            </div>
-            
-            <!-- Position Progress Chart -->
-            <div class="chart-card half-width">
-                <h3>Championship Position by Season</h3>
-                <div id="positionChart"></div>
-            </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="charts-container" id="chartsContainer" style="display: none">
+        <!-- Points Progress Chart -->
+        <div class="chart-card">
+          <h3>Points Progress by Season</h3>
+          <div id="pointsChart"></div>
         </div>
-        
-        <!-- Seasons Table -->
-        <div class="seasons-table-container" id="seasonsTableContainer" style="display: none;">
-            <h3>Season by Season Results</h3>
-            <div class="table-wrapper">
-                <table class="seasons-table">
-                    <thead>
-                        <tr>
-                            <th>Year</th>
-                            <th>Team</th>
-                            <th>Position</th>
-                            <th>Points</th>
-                            <th>Wins</th>
-                            <th>Podiums</th>
-                            <th>Poles</th>
-                            <th>DNFs</th>
-                        </tr>
-                    </thead>
-                    <tbody id="seasonsTableBody">
-                        <!-- Seasons data will be inserted here -->
-                    </tbody>
-                </table>
-            </div>
+
+        <!-- Wins and Podiums Chart -->
+        <div class="chart-card">
+          <h3>Wins and Podiums by Season</h3>
+          <div id="winsPodumsChart"></div>
         </div>
-        
-        <!-- No Driver Selected Message -->
-        <div class="no-driver-message" id="noDriverMessage">
-            <p>Please select a driver from the search box above to view their career statistics and visualizations.</p>
+
+        <!-- Teams Distribution Chart -->
+        <div class="chart-card half-width">
+          <h3>Races by Team</h3>
+          <div id="teamsChart"></div>
         </div>
+
+        <!-- Position Progress Chart -->
+        <div class="chart-card half-width">
+          <h3>Championship Position by Season</h3>
+          <div id="positionChart"></div>
+        </div>
+      </div>
+
+      <!-- Seasons Table -->
+      <div
+        class="seasons-table-container"
+        id="seasonsTableContainer"
+        style="display: none"
+      >
+        <h3>Season by Season Results</h3>
+        <div class="table-wrapper">
+          <table class="seasons-table">
+            <thead>
+              <tr>
+                <th>Year</th>
+                <th>Team</th>
+                <th>Position</th>
+                <th>Points</th>
+                <th>Wins</th>
+                <th>Podiums</th>
+                <th>Poles</th>
+                <th>DNFs</th>
+              </tr>
+            </thead>
+            <tbody id="seasonsTableBody">
+              <!-- Seasons data will be inserted here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- No Driver Selected Message -->
+      <div class="no-driver-message" id="noDriverMessage">
+        <p>
+          Please select a driver from the search box above to view their career
+          statistics and visualizations.
+        </p>
+      </div>
     </main>
-    
+
     <!-- Footer -->
     <footer>
-        <div class="footer-content">
-            <p>Powered by <a href="https://plotly.com/javascript/" target="_blank">Plotly.js</a> • Visualization by <a href="https://f1dashboards.com/about" target="_blank">Francesco Saviano</a></p>
-            <p>Data © <a href="https://www.kaggle.com/rohanrao" target="_blank">Rohan Rao</a> (<a href="https://www.kaggle.com/datasets/rohanrao/formula-1-world-championship-1950-2020" target="_blank">Kaggle: vopani</a>) – Based on the <a href="http://ergast.com/mrd/" target="_blank">Ergast Developer API</a></p>
-            <p>© 2025 F1Dashboards.com. Made with ❤️ for F1 fans.</p>
-        </div>
+      <div class="footer-content">
+        <p>
+          Powered by
+          <a href="https://plotly.com/javascript/" target="_blank">Plotly.js</a>
+          • Visualization by
+          <a href="https://f1dashboards.com/about" target="_blank"
+            >Francesco Saviano</a
+          >
+        </p>
+        <p>
+          Data ©
+          <a href="https://www.kaggle.com/rohanrao" target="_blank"
+            >Rohan Rao</a
+          >
+          (<a
+            href="https://www.kaggle.com/datasets/rohanrao/formula-1-world-championship-1950-2020"
+            target="_blank"
+            >Kaggle: vopani</a
+          >) – Based on the
+          <a href="http://ergast.com/mrd/" target="_blank"
+            >Ergast Developer API</a
+          >
+        </p>
+        <p>© 2025 F1Dashboards.com. Made with ❤️ for F1 fans.</p>
+      </div>
     </footer>
-    
+
     <!-- Custom JavaScript -->
     <script src="app.js"></script>
-</body>
+  </body>
 </html>
