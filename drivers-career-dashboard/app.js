@@ -420,7 +420,8 @@ function setupDriverSearch() {
     
     // Close search results when clicking outside
     document.addEventListener('click', (e) => {
-        if (!e.target.closest('.driver-selector')) {
+        // Check if click is outside search wrapper (not the entire driver-selector)
+        if (!e.target.closest('.search-wrapper')) {
             searchResults.classList.remove('active');
             if (isListOpen) {
                 isListOpen = false;
