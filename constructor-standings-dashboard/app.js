@@ -323,6 +323,31 @@ function setupEventListeners() {
     // Select/Clear all buttons
     document.getElementById('selectAllBtn').addEventListener('click', selectAllTeams);
     document.getElementById('clearAllBtn').addEventListener('click', clearAllTeams);
+    
+    // Mobile menu toggle
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    
+    mobileMenuToggle.addEventListener('click', () => {
+        mobileMenuToggle.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
+    });
+    
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.nav-menu') && !e.target.closest('.mobile-menu')) {
+            mobileMenuToggle.classList.remove('active');
+            mobileMenu.classList.remove('active');
+        }
+    });
+    
+    // Close mobile menu when clicking on a link
+    document.querySelectorAll('.mobile-menu-link').forEach(link => {
+        link.addEventListener('click', () => {
+            mobileMenuToggle.classList.remove('active');
+            mobileMenu.classList.remove('active');
+        });
+    });
 }
 
 /**
