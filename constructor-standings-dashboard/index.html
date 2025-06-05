@@ -1,179 +1,244 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>F1 Constructor Standings Dashboard</title>
-    
+
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Plotly.js -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Russo+One&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Plotly.js CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.27.0/plotly.min.js"></script>
-    
-    <!-- PapaParse for CSV parsing -->
+    <script>
+      // If the Plotly CDN fails, load the local version as a fallback
+      if (typeof Plotly === "undefined") {
+        var script = document.createElement("script");
+        script.src = "libs/plotly.min.js";
+        document.head.appendChild(script);
+      }
+    </script>
+
+    <!-- PapaParse CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    
+    <script>
+      // If the PapaParse CDN fails, load the local version as a fallback
+      if (typeof Papa === "undefined") {
+        var script = document.createElement("script");
+        script.src = "libs/papaparse.min.js";
+        document.head.appendChild(script);
+      }
+    </script>
+
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
     <!-- Loading Screen -->
     <div class="loader" id="loader">
-        <div class="loader-content">
-            <div class="loader-circle"></div>
-            <p class="loader-text">Loading F1 Data...</p>
-        </div>
+      <div class="loader-content">
+        <div class="loader-circle"></div>
+        <p class="loader-text">Loading F1 Data...</p>
+      </div>
     </div>
-    
+
     <!-- Header -->
     <header>
-        <div class="header-container">
-            <nav class="nav-menu">
-                <a href="/" class="home-icon" title="Home">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                    </svg>
-                </a>
-                
-                <div class="nav-links">
-                    <a href="#" class="nav-link active">Constructors</a>
-                    <a href="https://f1dashboards.com/dashboards/drivers-career-dashboard/" class="nav-link">Drivers</a>
-                    <a href="#" class="nav-link">Races</a>
-                    <a href="#" class="nav-link">Qualifying</a>
-                    <a href="#" class="nav-link">Pit Stop Analysis</a>
-                    <a href="#" class="nav-link">Circuit Insights</a>
-                </div>
-                
-                <button class="mobile-menu-toggle" id="mobileMenuToggle">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-            </nav>
-            
-            <a href="/" class="logo">F1 Dashboards</a>
-        </div>
+      <div class="header-container">
+        <nav class="nav-menu">
+          <a href="/" class="home-icon" title="Home">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+          </a>
+
+          <div class="nav-links">
+            <a href="#" class="nav-link active">Constructors</a>
+            <a
+              href="https://f1dashboards.com/dashboards/drivers-career-dashboard/"
+              class="nav-link"
+              >Drivers</a
+            >
+            <a href="#" class="nav-link">Races</a>
+            <a href="#" class="nav-link">Qualifying</a>
+            <a href="#" class="nav-link">Pit Stop Analysis</a>
+            <a href="#" class="nav-link">Circuit Insights</a>
+          </div>
+
+          <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </nav>
+
+        <a href="/" class="logo">F1 Dashboards</a>
+      </div>
     </header>
-    
+
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobileMenu">
-        <div class="mobile-menu-content">
-            <a href="/constructors" class="mobile-menu-link active">Constructors</a>
-            <a href="/drivers" class="mobile-menu-link">Drivers</a>
-            <a href="/races" class="mobile-menu-link">Races</a>
-            <a href="/qualifying" class="mobile-menu-link">Qualifying</a>
-            <a href="/pitstops" class="mobile-menu-link">Pit Stop Analysis</a>
-            <a href="/circuits" class="mobile-menu-link">Circuit Insights</a>
-        </div>
+      <div class="mobile-menu-content">
+        <a href="/constructors" class="mobile-menu-link active">Constructors</a>
+        <a href="/drivers" class="mobile-menu-link">Drivers</a>
+        <a href="/races" class="mobile-menu-link">Races</a>
+        <a href="/qualifying" class="mobile-menu-link">Qualifying</a>
+        <a href="/pitstops" class="mobile-menu-link">Pit Stop Analysis</a>
+        <a href="/circuits" class="mobile-menu-link">Circuit Insights</a>
+      </div>
     </div>
-    
+
     <!-- Main Content -->
     <main class="main-container">
-        <!-- Title and Description -->
-        <div class="hero-section">
-            <h1>Constructor Standings Dashboard</h1>
-            <p>Explore and analyze Formula 1 constructor championship standings from 1958 to 2024. The Constructors' Championship was introduced in 1958, making it a vital part of F1 history. Select a season to view the final standings, compare team performances throughout the year, and discover key statistics about each championship season.</p>
+      <!-- Title and Description -->
+      <div class="hero-section">
+        <h1>Constructor Standings Dashboard</h1>
+        <p>
+          Explore and analyze Formula 1 constructor championship standings from
+          1958 to 2024. The Constructors' Championship was introduced in 1958,
+          making it a vital part of F1 history. Select a season to view the
+          final standings, compare team performances throughout the year, and
+          discover key statistics about each championship season.
+        </p>
+      </div>
+      <!-- Season Selector -->
+      <div class="season-selector">
+        <h2>Select Season</h2>
+        <div class="select-wrapper">
+          <select id="seasonSelect">
+            <option value="">Loading seasons...</option>
+          </select>
         </div>
-        <!-- Season Selector -->
-        <div class="season-selector">
-            <h2>Select Season</h2>
-            <div class="select-wrapper">
-                <select id="seasonSelect">
-                    <option value="">Loading seasons...</option>
-                </select>
-            </div>
+      </div>
+
+      <!-- Statistics Section (moved up) -->
+      <div class="stats-container">
+        <h3>Season Statistics</h3>
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-card">
+            <h4>Total Races</h4>
+            <p class="stat-value" id="totalRaces">-</p>
+          </div>
+          <div class="stat-card">
+            <h4>Participating Teams</h4>
+            <p class="stat-value" id="totalTeams">-</p>
+          </div>
+          <div class="stat-card">
+            <h4>Constructors' Champion</h4>
+            <p class="stat-value" id="constructorChampion">-</p>
+          </div>
+          <div class="stat-card">
+            <h4>Drivers' Champion</h4>
+            <p class="stat-value" id="driverChampion">-</p>
+          </div>
         </div>
-        
-        <!-- Statistics Section (moved up) -->
-        <div class="stats-container">
-            <h3>Season Statistics</h3>
-            <div class="stats-grid" id="statsGrid">
-                <div class="stat-card">
-                    <h4>Total Races</h4>
-                    <p class="stat-value" id="totalRaces">-</p>
-                </div>
-                <div class="stat-card">
-                    <h4>Participating Teams</h4>
-                    <p class="stat-value" id="totalTeams">-</p>
-                </div>
-                <div class="stat-card">
-                    <h4>Constructors' Champion</h4>
-                    <p class="stat-value" id="constructorChampion">-</p>
-                </div>
-                <div class="stat-card">
-                    <h4>Drivers' Champion</h4>
-                    <p class="stat-value" id="driverChampion">-</p>
-                </div>
-            </div>
+      </div>
+
+      <!-- Grid Layout: Standings Table and Team Selector -->
+      <div class="grid-container">
+        <!-- Standings Table -->
+        <div class="standings-card">
+          <h3>Constructor Standings <span id="selectedYear"></span></h3>
+          <div class="table-wrapper">
+            <table class="standings-table">
+              <thead>
+                <tr>
+                  <th>Pos</th>
+                  <th>Constructor</th>
+                  <th>Points</th>
+                  <th>Wins</th>
+                </tr>
+              </thead>
+              <tbody id="standingsTableBody">
+                <tr>
+                  <td
+                    colspan="4"
+                    style="
+                      text-align: center;
+                      padding: 2rem;
+                      color: var(--text-secondary);
+                    "
+                  >
+                    Select a season to view standings
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-        
-        <!-- Grid Layout: Standings Table and Team Selector -->
-        <div class="grid-container">
-            <!-- Standings Table -->
-            <div class="standings-card">
-                <h3>Constructor Standings <span id="selectedYear"></span></h3>
-                <div class="table-wrapper">
-                    <table class="standings-table">
-                        <thead>
-                            <tr>
-                                <th>Pos</th>
-                                <th>Constructor</th>
-                                <th>Points</th>
-                                <th>Wins</th>
-                            </tr>
-                        </thead>
-                        <tbody id="standingsTableBody">
-                            <tr>
-                                <td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                                    Select a season to view standings
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <!-- Team Selector -->
-            <div class="team-selector">
-                <h3>Select Constructors to Compare</h3>
-                <div class="team-controls">
-                    <button id="selectAllBtn" class="control-btn">Select All</button>
-                    <button id="clearAllBtn" class="control-btn">Clear All</button>
-                </div>
-                <div class="team-checkboxes" id="teamCheckboxes">
-                    <p style="color: var(--text-secondary);">Loading constructors...</p>
-                </div>
-            </div>
+
+        <!-- Team Selector -->
+        <div class="team-selector">
+          <h3>Select Constructors to Compare</h3>
+          <div class="team-controls">
+            <button id="selectAllBtn" class="control-btn">Select All</button>
+            <button id="clearAllBtn" class="control-btn">Clear All</button>
+          </div>
+          <div class="team-checkboxes" id="teamCheckboxes">
+            <p style="color: var(--text-secondary)">Loading constructors...</p>
+          </div>
         </div>
-        
-        <!-- Chart Section -->
-        <div class="chart-container">
-            <h3>Constructor Points Progress Over Time</h3>
-            <div class="chart-controls">
-                <label for="chartType">Chart Type:</label>
-                <select id="chartType">
-                    <option value="line">Line Chart</option>
-                    <option value="area">Area Chart</option>
-                </select>
-            </div>
-            <div id="plotly-chart"></div>
+      </div>
+
+      <!-- Chart Section -->
+      <div class="chart-container">
+        <h3>Constructor Points Progress Over Time</h3>
+        <div class="chart-controls">
+          <label for="chartType">Chart Type:</label>
+          <select id="chartType">
+            <option value="line">Line Chart</option>
+            <option value="area">Area Chart</option>
+          </select>
         </div>
+        <div id="plotly-chart"></div>
+      </div>
     </main>
-    
+
     <!-- Footer -->
     <footer>
-        <div class="footer-content">
-            <p>Powered by <a href="https://plotly.com/javascript/" target="_blank">Plotly.js</a> • Visualization by <a href="https://f1dashboards.com/about" target="_blank">Francesco Saviano</a></p>
-            <p>Data © <a href="https://www.kaggle.com/rohanrao" target="_blank">Rohan Rao</a> (<a href="https://www.kaggle.com/datasets/rohanrao/formula-1-world-championship-1950-2020" target="_blank">Kaggle: vopani</a>) – Based on the <a href="http://ergast.com/mrd/" target="_blank">Ergast Developer API</a></p>
-            <p>© 2025 F1Dashboards.com. Made with ❤️ for F1 fans.</p>
-        </div>
+      <div class="footer-content">
+        <p>
+          Powered by
+          <a href="https://plotly.com/javascript/" target="_blank">Plotly.js</a>
+          • Visualization by
+          <a href="https://f1dashboards.com/about" target="_blank"
+            >Francesco Saviano</a
+          >
+        </p>
+        <p>
+          Data ©
+          <a href="https://www.kaggle.com/rohanrao" target="_blank"
+            >Rohan Rao</a
+          >
+          (<a
+            href="https://www.kaggle.com/datasets/rohanrao/formula-1-world-championship-1950-2020"
+            target="_blank"
+            >Kaggle: vopani</a
+          >) – Based on the
+          <a href="http://ergast.com/mrd/" target="_blank"
+            >Ergast Developer API</a
+          >
+        </p>
+        <p>© 2025 F1Dashboards.com. Made with ❤️ for F1 fans.</p>
+      </div>
     </footer>
-    
+
     <!-- Custom JavaScript -->
     <script src="app.js"></script>
-</body>
+  </body>
 </html>
