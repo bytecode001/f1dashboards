@@ -926,7 +926,8 @@ footer {
     }
     
     .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr;
+        gap: 1rem;
     }
     
     .teams-timeline {
@@ -935,6 +936,19 @@ footer {
     
     .table-wrapper {
         max-height: 400px;
+    }
+    
+    .main-container {
+        padding: 1rem;
+    }
+    
+    .driver-selector,
+    .driver-profile,
+    .stats-container,
+    .teams-section,
+    .chart-card,
+    .seasons-table-container {
+        padding: 1.5rem;
     }
 }
 
