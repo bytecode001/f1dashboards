@@ -1,1 +1,302 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 Race Results Explorer - F1Dashboards</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Plotly.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.27.0/plotly.min.js"></script>
+    <script>
+        // Plotly fallback
+        if (typeof Plotly === 'undefined') {
+            var script = document.createElement('script');
+            script.src = 'libs/plotly.min.js';
+            document.head.appendChild(script);
+        }
+    </script>
+    
+    <!-- PapaParse CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script>
+        // PapaParse fallback
+        if (typeof Papa === 'undefined') {
+            var script = document.createElement('script');
+            script.src = 'libs/papaparse.min.js';
+            document.head.appendChild(script);
+        }
+    </script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loader" id="loader">
+        <div class="loader-content">
+            <div class="loader-circle"></div>
+            <p class="loader-text">Loading Race Data...</p>
+        </div>
+    </div>
+    
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <nav class="nav-menu">
+                <a href="/" class="home-icon" title="Home">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                </a>
+                
+                <div class="nav-links">
+                    <a href="https://f1dashboards.com/dashboards/constructor-standings-dashboard/" class="nav-link">Constructors</a>
+                    <a href="https://f1dashboards.com/dashboards/drivers-career-dashboard/" class="nav-link">Drivers</a>
+                    <a href="https://f1dashboards.com/dashboards/race-results-explorer/" class="nav-link active">Races</a>
+                    <a href="#" class="nav-link">Qualifying</a>
+                    <a href="#" class="nav-link">Pit Stop Analysis</a>
+                    <a href="#" class="nav-link">Circuit Insights</a>
+                </div>
+                
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </nav>
+            
+            <a href="/" class="logo">F1 Dashboards</a>
+        </div>
+    </header>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-content">
+            <a href="https://f1dashboards.com/dashboards/constructor-standings-dashboard/" class="mobile-menu-link">Constructors</a>
+            <a href="https://f1dashboards.com/dashboards/drivers-career-dashboard/" class="mobile-menu-link">Drivers</a>
+            <a href="https://f1dashboards.com/dashboards/race-results-explorer/" class="mobile-menu-link active">Races</a>
+            <a href="#" class="mobile-menu-link">Qualifying</a>
+            <a href="#" class="mobile-menu-link">Pit Stop Analysis</a>
+            <a href="#" class="mobile-menu-link">Circuit Insights</a>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <h1>Race Results Explorer</h1>
+            <p>Explore comprehensive Formula 1 race results year by year. Select a season to view all races, analyze results, and discover championship progression throughout the year.</p>
+        </div>
+        
+        <!-- Year Selector Section -->
+        <div class="year-selector-section">
+            <div class="year-selector-card">
+                <h2>Select Season</h2>
+                <div class="year-selector-wrapper">
+                    <button class="year-nav-btn" id="prevYearBtn" aria-label="Previous year">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <div class="year-display" id="yearDisplay">2024</div>
+                    <button class="year-nav-btn" id="nextYearBtn" aria-label="Next year">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </button>
+                </div>
+                <select id="yearSelect" class="year-dropdown">
+                    <option value="">Loading...</option>
+                </select>
+            </div>
+            
+            <!-- Season Statistics -->
+            <div class="season-stats">
+                <div class="stat-card">
+                    <h4>Total Races</h4>
+                    <p class="stat-value" id="seasonTotalRaces">-</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Drivers' Champion</h4>
+                    <p class="stat-value stat-small" id="seasonDriverChampion">-</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Constructors' Champion</h4>
+                    <p class="stat-value stat-small" id="seasonConstructorChampion">-</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Race Calendar Grid -->
+        <div class="races-section" id="racesSection">
+            <div class="section-header">
+                <h2>Race Calendar</h2>
+                <div class="view-toggle">
+                    <button class="view-btn active" data-view="grid" id="gridViewBtn">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <rect x="1" y="1" width="6" height="6"/>
+                            <rect x="9" y="1" width="6" height="6"/>
+                            <rect x="1" y="9" width="6" height="6"/>
+                            <rect x="9" y="9" width="6" height="6"/>
+                        </svg>
+                        Grid
+                    </button>
+                    <button class="view-btn" data-view="list" id="listViewBtn">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <rect x="1" y="2" width="14" height="2"/>
+                            <rect x="1" y="7" width="14" height="2"/>
+                            <rect x="1" y="12" width="14" height="2"/>
+                        </svg>
+                        List
+                    </button>
+                </div>
+            </div>
+            
+            <div class="races-grid" id="racesGrid">
+                <!-- Race cards will be populated here -->
+            </div>
+        </div>
+        
+        <!-- Race Details Section -->
+        <div class="race-details-section" id="raceDetailsSection" style="display: none;">
+            <div class="race-details-header">
+                <button class="back-btn" id="backToRacesBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                    Back to races
+                </button>
+                <div class="race-navigation">
+                    <button class="race-nav-btn" id="prevRaceBtn" title="Previous race">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <h3 id="raceDetailsTitle">Race Name</h3>
+                    <button class="race-nav-btn" id="nextRaceBtn" title="Next race">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Race Info Bar -->
+            <div class="race-info-bar">
+                <div class="info-item">
+                    <span class="info-label">Date</span>
+                    <span class="info-value" id="raceDate">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Circuit</span>
+                    <span class="info-value" id="raceCircuit">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Round</span>
+                    <span class="info-value" id="raceRound">-</span>
+                </div>
+            </div>
+            
+            <!-- Race Highlights -->
+            <div class="race-highlights">
+                <div class="highlight-card">
+                    <h4>Winner</h4>
+                    <div class="winner-info" id="winnerInfo">
+                        <p class="driver-name">-</p>
+                        <p class="team-name">-</p>
+                    </div>
+                </div>
+                <div class="highlight-card">
+                    <h4>Podium</h4>
+                    <div class="podium-list" id="podiumList">
+                        <div class="podium-item">1. -</div>
+                        <div class="podium-item">2. -</div>
+                        <div class="podium-item">3. -</div>
+                    </div>
+                </div>
+                <div class="highlight-card">
+                    <h4>Fastest Lap</h4>
+                    <div class="fastest-lap-info" id="fastestLapInfo">
+                        <p class="driver-name">-</p>
+                        <p class="lap-time">-</p>
+                    </div>
+                </div>
+                <div class="highlight-card">
+                    <h4>Pole Position</h4>
+                    <div class="fastest-lap-info" id="poleInfo">
+                        <p class="driver-name">-</p>
+                        <p class="lap-time">-</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Results Table -->
+            <div class="results-card">
+                <h3>Race Results</h3>
+                <div class="table-wrapper">
+                    <table class="results-table" id="resultsTable">
+                        <thead>
+                            <tr>
+                                <th>Pos</th>
+                                <th>Driver</th>
+                                <th>Constructor</th>
+                                <th>Grid</th>
+                                <th>Status</th>
+                                <th>Points</th>
+                                <th>Time/Gap</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody">
+                            <tr>
+                                <td colspan="7" class="no-data">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Championship Progress Section -->
+        <div class="championship-section" id="championshipSection" style="display: none;">
+            <h2>Championship Progress</h2>
+            <div class="chart-tabs">
+                <button class="chart-tab active" data-chart="drivers" id="driversChartTab">Drivers</button>
+                <button class="chart-tab" data-chart="constructors" id="constructorsChartTab">Constructors</button>
+            </div>
+            <div class="chart-card">
+                <div id="championshipChart" class="plotly-chart"></div>
+            </div>
+        </div>
+        
+        <!-- Season Summary Section -->
+        <div class="season-summary" id="seasonSummary" style="display: none;">
+            <h2>Season Summary</h2>
+            <div class="summary-grid">
+                <div class="summary-card full-width">
+                    <h3>Winners Distribution</h3>
+                    <div id="winnersChart" class="plotly-chart-small"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <p>Powered by <a href="https://plotly.com/javascript/" target="_blank">Plotly.js</a> • Visualization by <a href="https://f1dashboards.com/about" target="_blank">Francesco Saviano</a></p>
+            <p>Data © <a href="https://www.kaggle.com/rohanrao" target="_blank">Rohan Rao</a> (<a href="https://www.kaggle.com/datasets/rohanrao/formula-1-world-championship-1950-2020" target="_blank">Kaggle: vopani</a>) – Based on the <a href="http://ergast.com/mrd/" target="_blank">Ergast Developer API</a></p>
+            <p>© 2025 F1Dashboards.com. Made with ❤️ for F1 fans.</p>
+        </div>
+    </footer>
+    
+    <!-- Custom JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>

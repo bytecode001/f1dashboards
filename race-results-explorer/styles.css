@@ -1,0 +1,1229 @@
+/* F1 Race Results Explorer - Custom Styles */
+
+:root {
+    /* Color Variables */
+    --primary-bg: #1a1a2e;
+    --secondary-bg: #15151e;
+    --accent: #ff1801;
+    --accent-hover: #ff3520;
+    --text-primary: #ffffff;
+    --text-secondary: #b8b8b8;
+    --card-bg: rgba(21, 21, 30, 0.7);
+    --border-color: rgba(255, 255, 255, 0.1);
+    
+    /* Status Colors */
+    --status-finished: #00D2BE;
+    --status-dnf: #ff1801;
+    --status-disqualified: #FF8700;
+    --status-accident: #DC0000;
+    --status-retired: #787878;
+    
+    /* Position Colors */
+    --gold: #FFD700;
+    --silver: #C0C0C0;
+    --bronze: #CD7F32;
+    
+    /* Spacing and Layout */
+    --border-radius: 12px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --header-height: 80px;
+    --container-width: 1400px;
+}
+
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background-color: var(--primary-bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+/* Loading Screen */
+.loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--primary-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s, visibility 0.5s;
+}
+
+.loader.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.loader-content {
+    text-align: center;
+}
+
+.loader-circle {
+    width: 60px;
+    height: 60px;
+    border: 3px solid var(--secondary-bg);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+.loader-text {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Header Styles */
+header {
+    background-color: var(--secondary-bg);
+    height: var(--header-height);
+    position: sticky;
+    top: 0;
+    z-index: 500;
+    backdrop-filter: blur(10px);
+    background-color: rgba(21, 21, 30, 0.95);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+}
+
+.header-container {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 0 2rem;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Navigation Menu */
+.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.home-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    transition: var(--transition);
+    padding: 0.5rem;
+    border-radius: 8px;
+}
+
+.home-icon:hover {
+    color: var(--accent);
+    background-color: rgba(255, 24, 1, 0.1);
+}
+
+.home-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: var(--transition);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    position: relative;
+}
+
+.nav-link:hover {
+    color: var(--text-primary);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.nav-link.active {
+    color: var(--accent);
+}
+
+.nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 3px;
+    background-color: var(--accent);
+    border-radius: 2px;
+}
+
+.logo {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.8rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    position: relative;
+    transition: var(--transition);
+}
+
+.logo::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background-color: var(--accent);
+    transition: width 0.3s;
+}
+
+.logo:hover::after {
+    width: 100%;
+}
+
+/* Mobile Menu Toggle */
+.mobile-menu-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.mobile-menu-toggle span {
+    width: 24px;
+    height: 2px;
+    background-color: var(--text-primary);
+    transition: var(--transition);
+}
+
+.mobile-menu-toggle.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.mobile-menu-toggle.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.mobile-menu-toggle.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* Mobile Menu */
+.mobile-menu {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    background-color: var(--secondary-bg);
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
+    z-index: 400;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-menu.active {
+    transform: translateY(0);
+}
+
+.mobile-menu-content {
+    padding: 1rem;
+}
+
+.mobile-menu-link {
+    display: block;
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: var(--transition);
+    border-radius: 8px;
+}
+
+.mobile-menu-link:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+.mobile-menu-link.active {
+    color: var(--accent);
+    background-color: rgba(255, 24, 1, 0.1);
+}
+
+/* Main Container */
+.main-container {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Hero Section */
+.hero-section {
+    text-align: center;
+    margin-bottom: 3rem;
+    animation: slideIn 0.5s ease-out;
+}
+
+.hero-section h1 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 2.5rem;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.hero-section p {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.8;
+}
+
+/* Year Selector Section */
+.year-selector-section {
+    margin-bottom: 3rem;
+    animation: slideIn 0.6s ease-out;
+}
+
+.year-selector-card {
+    background-color: var(--card-bg);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.year-selector-card h2 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-secondary);
+}
+
+.year-selector-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.year-nav-btn {
+    background: none;
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--accent);
+}
+
+.year-nav-btn:hover {
+    background-color: var(--accent);
+    color: var(--text-primary);
+    transform: scale(1.1);
+}
+
+.year-nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.year-nav-btn:disabled:hover {
+    background: none;
+    transform: none;
+    color: var(--accent);
+}
+
+.year-display {
+    font-family: 'Russo One', sans-serif;
+    font-size: 4rem;
+    color: var(--accent);
+    font-weight: bold;
+    min-width: 200px;
+}
+
+.year-dropdown {
+    width: 200px;
+    padding: 0.75rem 1rem;
+    background-color: var(--secondary-bg);
+    color: var(--text-primary);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    appearance: none;
+    transition: var(--transition);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ff1801' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+    margin: 0 auto;
+    display: block;
+}
+
+.year-dropdown:hover {
+    border-color: var(--accent);
+}
+
+.year-dropdown:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(255, 24, 1, 0.2);
+}
+
+/* Season Statistics */
+.season-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.stat-card {
+    background-color: var(--secondary-bg);
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    transition: var(--transition);
+    border: 1px solid var(--border-color);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(255, 24, 1, 0.2);
+    border-color: var(--accent);
+}
+
+.stat-card h4 {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-family: 'Russo One', sans-serif;
+    font-size: 2rem;
+    color: var(--accent);
+}
+
+.stat-value.stat-small {
+    font-size: 1.25rem;
+    line-height: 1.4;
+}
+
+/* Races Section */
+.races-section {
+    margin-bottom: 3rem;
+    animation: slideIn 0.7s ease-out;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.section-header h2 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.8rem;
+}
+
+.view-toggle {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.view-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--secondary-bg);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.875rem;
+}
+
+.view-btn:hover {
+    color: var(--text-primary);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.view-btn.active {
+    background-color: var(--accent);
+    color: var(--text-primary);
+    border-color: var(--accent);
+}
+
+/* Races Grid */
+.races-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.races-grid.list-view {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+/* Race Card */
+.race-card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.race-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(255, 24, 1, 0.2);
+    border-color: var(--accent);
+}
+
+.race-card.list-view {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 2rem;
+    padding: 1.25rem 1.5rem;
+}
+
+.race-round {
+    font-family: 'Russo One', sans-serif;
+    font-size: 2rem;
+    color: var(--accent);
+    opacity: 0.3;
+    margin-bottom: 0.5rem;
+}
+
+.race-card.list-view .race-round {
+    margin-bottom: 0;
+    font-size: 1.5rem;
+}
+
+.race-name {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.race-card.list-view .race-name {
+    margin-bottom: 0;
+}
+
+.race-date {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.race-card.list-view .race-date {
+    margin-bottom: 0;
+}
+
+.race-circuit {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.race-podium {
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+    margin-top: 1rem;
+}
+
+.race-card.list-view .race-podium {
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 1rem;
+}
+
+.podium-title {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.race-card.list-view .podium-title {
+    display: none;
+}
+
+.podium-position {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.race-card.list-view .podium-position {
+    margin-bottom: 0;
+}
+
+.podium-position span:first-child {
+    font-weight: 600;
+    min-width: 20px;
+}
+
+.position-1 {
+    color: var(--gold);
+}
+
+.position-2 {
+    color: var(--silver);
+}
+
+.position-3 {
+    color: var(--bronze);
+}
+
+.race-flag {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    opacity: 0.7;
+}
+
+/* Race Details Section */
+.race-details-section {
+    animation: slideIn 0.5s ease-out;
+}
+
+.race-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.back-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: var(--transition);
+    padding: 0.5rem;
+    margin: -0.5rem;
+}
+
+.back-btn:hover {
+    color: var(--accent);
+}
+
+.race-navigation {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.race-navigation h3 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.5rem;
+    color: var(--accent);
+    margin: 0;
+    min-width: 300px;
+    text-align: center;
+}
+
+.race-nav-btn {
+    background: none;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--text-secondary);
+}
+
+.race-nav-btn:hover {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: var(--text-primary);
+}
+
+.race-nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* Race Info Bar */
+.race-info-bar {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.info-item {
+    text-align: center;
+}
+
+.info-label {
+    display: block;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+}
+
+.info-value {
+    display: block;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Race Highlights */
+.race-highlights {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.highlight-card {
+    background-color: var(--secondary-bg);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.highlight-card h4 {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+}
+
+.winner-info .driver-name,
+.fastest-lap-info .driver-name {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.25rem;
+    color: var(--accent);
+    margin-bottom: 0.25rem;
+}
+
+.winner-info .team-name,
+.fastest-lap-info .lap-time {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.podium-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.podium-item {
+    font-size: 0.95rem;
+}
+
+.podium-item:nth-child(1) {
+    color: var(--gold);
+    font-weight: 600;
+}
+
+.podium-item:nth-child(2) {
+    color: var(--silver);
+}
+
+.podium-item:nth-child(3) {
+    color: var(--bronze);
+}
+
+.race-stats-mini p {
+    margin-bottom: 0.25rem;
+    font-size: 0.95rem;
+}
+
+.race-stats-mini span {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* Results Table */
+.results-card {
+    background-color: var(--card-bg);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    margin-bottom: 2rem;
+}
+
+.results-card h3 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    max-height: 600px;
+    overflow-y: auto;
+    border-radius: 8px;
+}
+
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+}
+
+.results-table th {
+    text-align: left;
+    padding: 1rem;
+    border-bottom: 2px solid var(--accent);
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: sticky;
+    top: 0;
+    background-color: var(--card-bg);
+    z-index: 10;
+}
+
+.results-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+
+.results-table tr:hover td {
+    background-color: rgba(255, 24, 1, 0.05);
+}
+
+.no-data {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 3rem !important;
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-finished {
+    background-color: rgba(0, 210, 190, 0.2);
+    color: var(--status-finished);
+    border: 1px solid var(--status-finished);
+}
+
+.status-dnf {
+    background-color: rgba(255, 24, 1, 0.2);
+    color: var(--status-dnf);
+    border: 1px solid var(--status-dnf);
+}
+
+.status-accident {
+    background-color: rgba(220, 0, 0, 0.2);
+    color: var(--status-accident);
+    border: 1px solid var(--status-accident);
+}
+
+.status-retired {
+    background-color: rgba(120, 120, 120, 0.2);
+    color: var(--status-retired);
+    border: 1px solid var(--status-retired);
+}
+
+.status-disqualified {
+    background-color: rgba(255, 135, 0, 0.2);
+    color: var(--status-disqualified);
+    border: 1px solid var(--status-disqualified);
+}
+
+/* Championship Section */
+.championship-section {
+    margin-bottom: 3rem;
+    animation: slideIn 0.8s ease-out;
+}
+
+.championship-section h2 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+}
+
+.chart-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.chart-tab {
+    padding: 0.75rem 1.5rem;
+    background-color: var(--secondary-bg);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.chart-tab:hover {
+    color: var(--text-primary);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.chart-tab.active {
+    background-color: var(--accent);
+    color: var(--text-primary);
+    border-color: var(--accent);
+}
+
+.chart-card {
+    background-color: var(--card-bg);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+}
+
+.plotly-chart {
+    width: 100%;
+    height: 500px;
+}
+
+.plotly-chart-small {
+    width: 100%;
+    height: 350px;
+}
+
+/* Season Summary */
+.season-summary {
+    margin-bottom: 3rem;
+    animation: slideIn 0.9s ease-out;
+}
+
+.season-summary h2 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+.summary-card {
+    background-color: var(--card-bg);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+}
+
+.summary-card.full-width {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.summary-card h3 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Footer */
+footer {
+    background-color: var(--secondary-bg);
+    padding: 2rem 0;
+    margin-top: 4rem;
+    text-align: center;
+}
+
+.footer-content {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 0 2rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.footer-content p {
+    margin: 0.5rem 0;
+}
+
+.footer-content a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: opacity 0.3s;
+}
+
+.footer-content a:hover {
+    opacity: 0.8;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--secondary-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-hover);
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .nav-links {
+        gap: 1rem;
+    }
+    
+    .nav-link {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .year-display {
+        font-size: 3rem;
+    }
+    
+    .races-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+    
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-container {
+        padding: 1rem;
+    }
+    
+    .nav-links {
+        display: none;
+    }
+    
+    .mobile-menu-toggle {
+        display: flex;
+    }
+    
+    .nav-menu {
+        gap: 1rem;
+    }
+    
+    header {
+        height: auto;
+    }
+    
+    .logo {
+        font-size: 1.5rem;
+    }
+    
+    .home-icon {
+        padding: 0.75rem;
+    }
+    
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+    
+    .hero-section p {
+        font-size: 1rem;
+        padding: 0 1rem;
+    }
+    
+    .main-container {
+        padding: 1rem;
+    }
+    
+    .year-selector-wrapper {
+        gap: 1rem;
+    }
+    
+    .year-display {
+        font-size: 2.5rem;
+        min-width: 150px;
+    }
+    
+    .year-nav-btn {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .season-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .races-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .race-details-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .race-navigation {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .race-navigation h3 {
+        min-width: auto;
+        font-size: 1.25rem;
+    }
+    
+    .race-info-bar {
+        gap: 1rem;
+    }
+    
+    .race-highlights {
+        grid-template-columns: 1fr;
+    }
+    
+    .table-wrapper {
+        max-height: 400px;
+    }
+    
+    .plotly-chart {
+        height: 350px;
+    }
+    
+    .plotly-chart-small {
+        height: 300px;
+    }
+    
+    .footer-content {
+        padding: 0 1rem;
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .season-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .chart-tabs {
+        width: 100%;
+    }
+    
+    .chart-tab {
+        flex: 1;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+}
