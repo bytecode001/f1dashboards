@@ -583,7 +583,7 @@ function populateYearSelector() {
  */
 function navigateYear(direction) {
     const currentIndex = availableYears.indexOf(currentYear);
-    const newIndex = currentIndex + direction;
+    const newIndex = currentIndex - direction; // Inverted: subtract direction instead of add
     
     if (newIndex >= 0 && newIndex < availableYears.length) {
         currentYear = availableYears[newIndex];
@@ -601,7 +601,9 @@ function updateYearDisplay() {
     
     // Update navigation buttons
     const currentIndex = availableYears.indexOf(currentYear);
+    // Left button disabled when at oldest year (end of array)
     document.getElementById('prevYearBtn').disabled = currentIndex === availableYears.length - 1;
+    // Right button disabled when at newest year (start of array)
     document.getElementById('nextYearBtn').disabled = currentIndex === 0;
 }
 
