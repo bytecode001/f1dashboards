@@ -1039,7 +1039,7 @@ function getTeamColor(constructorRef) {
 }
 
 /**
- * Update championship progress chart
+ * Update championship progress chart and standings
  */
 function updateChampionshipProgress() {
     const yearRaces = seasonData[currentYear].races.sort((a, b) => a.round - b.round);
@@ -1082,8 +1082,104 @@ function updateChampionshipProgress() {
         races: yearRaces
     };
     
+    // Update final standings tables
+    updateFinalStandings();
+    
     // Show initial chart
     showChampionshipChart('drivers');
+}
+
+/**
+ * Update final standings tables
+ */
+function updateFinalStandings() {
+    const yearRaces = seasonData[currentYear].races;
+    const lastRace = yearRaces.sort((a, b) => b.round - a.round)[0];
+    
+    if (!lastRace) return;
+    
+    // Update drivers standings
+    const finalDriverStandings = driverStandingsData
+        .filter(s => s.raceId === lastRace.raceId)
+        .sort((a, b) => (a.position || 999) - (b.position || 999));
+    
+    const driversBody = document.getElementById('driversStandingsBody');
+    driversBody.innerHTML = '';
+    
+    if (finalDriverStandings.length > 0) {
+        finalDriverStandings.forEach((standing, index) => {
+            const driver = driversMap[standing.driverId];
+            if (!driver) return;
+            
+            // Find driver's team from results
+            const driverResults = resultsData.filter(r => 
+                r.driverId === standing.driverId && 
+                yearRaces.some(race => race.raceId === r.raceId)
+            );
+            
+            // Get most common constructor
+            const constructorCounts = {};
+            driverResults.forEach(r => {
+                if (r.constructorId) {
+                    constructorCounts[r.constructorId] = (constructorCounts[r.constructorId] || 0) + 1;
+                }
+            });
+            
+            let teamName = 'N/A';
+            if (Object.keys(constructorCounts).length > 0) {
+                const mainConstructorId = Object.entries(constructorCounts)
+                    .sort((a, b) => b[1] - a[1])[0][0];
+                const constructor = constructorsMap[mainConstructorId];
+                teamName = constructor ? constructor.name : 'N/A';
+            }
+            
+            const tr = document.createElement('tr');
+            const positionClass = index === 0 ? 'position-1' : 
+                                index === 1 ? 'position-2' : 
+                                index === 2 ? 'position-3' : '';
+            
+            tr.innerHTML = `
+                <td class="${positionClass}">${standing.position || index + 1}</td>
+                <td>${driver.fullName}</td>
+                <td>${teamName}</td>
+                <td>${standing.points || 0}</td>
+            `;
+            
+            driversBody.appendChild(tr);
+        });
+    } else {
+        driversBody.innerHTML = '<tr><td colspan="4" class="no-data">No data available</td></tr>';
+    }
+    
+    // Update constructors standings
+    const finalConstructorStandings = constructorStandingsData
+        .filter(s => s.raceId === lastRace.raceId)
+        .sort((a, b) => (a.position || 999) - (b.position || 999));
+    
+    const constructorsBody = document.getElementById('constructorsStandingsBody');
+    constructorsBody.innerHTML = '';
+    
+    if (finalConstructorStandings.length > 0) {
+        finalConstructorStandings.forEach((standing, index) => {
+            const constructor = constructorsMap[standing.constructorId];
+            if (!constructor) return;
+            
+            const tr = document.createElement('tr');
+            const positionClass = index === 0 ? 'position-1' : 
+                                index === 1 ? 'position-2' : 
+                                index === 2 ? 'position-3' : '';
+            
+            tr.innerHTML = `
+                <td class="${positionClass}">${standing.position || index + 1}</td>
+                <td>${constructor.name}</td>
+                <td>${standing.points || 0}</td>
+            `;
+            
+            constructorsBody.appendChild(tr);
+        });
+    } else {
+        constructorsBody.innerHTML = '<tr><td colspan="3" class="no-data">No data available</td></tr>';
+    }
 }
 
 /**
@@ -1250,8 +1346,11 @@ function updateSeasonSummary() {
     const allWinners = Object.values(winnerData).sort((a, b) => b.wins - a.wins);
     const totalWinners = allWinners.length;
     
-    // Take only top 10 winners
+    // Take up to 10 winners (might be less)
     const winners = allWinners.slice(0, 10);
+    
+    // Dynamic title based on actual data
+    const chartTitle = totalWinners > 10 ? 'Race Winners - Top 10' : 'Race Winners';
     
     const winnersTrace = {
         labels: winners.map(w => w.driver),
@@ -1271,9 +1370,19 @@ function updateSeasonSummary() {
         )
     };
     
+    // Build annotation text
+    let annotationText = '';
+    if (totalWinners > 10) {
+        annotationText = `Showing top 10 of ${totalWinners} different winners`;
+    } else if (totalWinners === 1) {
+        annotationText = `${totalWinners} winner in this season`;
+    } else {
+        annotationText = `${totalWinners} different winners in this season`;
+    }
+    
     const winnersLayout = {
         title: {
-            text: 'Race Winners - Top 10',
+            text: chartTitle,
             font: { family: 'Russo One, sans-serif', size: 18, color: '#ffffff' }
         },
         showlegend: false,
@@ -1286,7 +1395,7 @@ function updateSeasonSummary() {
         },
         height: 400,
         annotations: [{
-            text: totalWinners > 10 ? `Showing top 10 of ${totalWinners} different winners` : `Total: ${totalWinners} different winners`,
+            text: annotationText,
             showarrow: false,
             xref: 'paper',
             yref: 'paper',

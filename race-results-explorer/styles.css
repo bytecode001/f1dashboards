@@ -916,7 +916,81 @@ header {
 .championship-section h2 {
     font-family: 'Russo One', sans-serif;
     font-size: 1.8rem;
+    margin-bottom: 2rem;
+}
+
+/* Standings Container */
+.standings-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.standings-table-wrapper {
+    background-color: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+}
+
+.standings-table-wrapper h3 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.25rem;
     margin-bottom: 1rem;
+    color: var(--accent);
+}
+
+.table-scroll {
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.standings-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.standings-table th {
+    text-align: left;
+    padding: 0.75rem;
+    border-bottom: 2px solid var(--accent);
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: sticky;
+    top: 0;
+    background-color: var(--card-bg);
+    z-index: 10;
+}
+
+.standings-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+
+.standings-table tr:hover td {
+    background-color: rgba(255, 24, 1, 0.05);
+}
+
+.standings-table .position-1 {
+    color: var(--gold);
+    font-weight: 700;
+}
+
+.standings-table .position-2 {
+    color: var(--silver);
+    font-weight: 600;
+}
+
+.standings-table .position-3 {
+    color: var(--bronze);
+    font-weight: 600;
 }
 
 .chart-tabs {
