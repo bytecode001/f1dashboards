@@ -335,6 +335,27 @@ function setupEventListeners() {
     document.getElementById('selectAllBtn').addEventListener('click', selectAllTeams);
     document.getElementById('clearAllBtn').addEventListener('click', clearAllTeams);
     
+    // Tab navigation
+    const tabButtons = document.querySelectorAll('.tab-button');
+    tabButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            // Remove active class from all buttons and contents
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Add active class to clicked button
+            e.target.classList.add('active');
+            
+            // Show corresponding content
+            const tabName = e.target.dataset.tab;
+            if (tabName === 'constructors') {
+                document.getElementById('constructorsTab').classList.add('active');
+            } else if (tabName === 'drivers') {
+                document.getElementById('driversTab').classList.add('active');
+            }
+        });
+    });
+    
     // Mobile menu toggle
     const mobileMenuToggle = document.getElementById('mobileMenuToggle');
     const mobileMenu = document.getElementById('mobileMenu');
@@ -369,6 +390,7 @@ function updateDashboard() {
     if (!selectedYear) return;
     
     updateStandingsTable(selectedYear);
+    updateDriversTable(selectedYear);
     updateTeamCheckboxes(selectedYear);
     updateStatistics(selectedYear);
     updateChart();
@@ -863,6 +885,85 @@ function updateChart() {
     };
     
     Plotly.newPlot('plotly-chart', traces, layout, config);
+}
+
+/**
+ * Update drivers standings table
+ */
+function updateDriversTable(year) {
+    const driverYearData = processedDriverData[year];
+    if (!driverYearData) {
+        console.warn(`No driver data available for year ${year}`);
+        return;
+    }
+    
+    // Get all races for this year to find driver-team relationships
+    const yearRaceIds = Object.entries(raceYearMap)
+        .filter(([raceId, raceYear]) => raceYear == year)
+        .map(([raceId]) => parseInt(raceId));
+    
+    // Sort drivers by position/points
+    const sortedDrivers = Object.entries(driverYearData)
+        .map(([driverId, data]) => ({
+            ...data,
+            driver: driversMap[driverId]
+        }))
+        .filter(item => item.driver)
+        .sort((a, b) => {
+            if (a.position !== b.position) {
+                return a.position - b.position;
+            }
+            return b.points - a.points;
+        });
+    
+    // Update table body
+    const tbody = document.getElementById('driversTableBody');
+    tbody.innerHTML = '';
+    
+    sortedDrivers.forEach((item, index) => {
+        // Find the team for this driver
+        const driverResults = resultsData.filter(result => 
+            result.driverId == item.driver.id && 
+            yearRaceIds.includes(result.raceId)
+        );
+        
+        // Get the most common constructor
+        const constructorCounts = {};
+        driverResults.forEach(result => {
+            if (result.constructorId) {
+                constructorCounts[result.constructorId] = (constructorCounts[result.constructorId] || 0) + 1;
+            }
+        });
+        
+        let teamName = 'N/A';
+        let maxCount = 0;
+        Object.entries(constructorCounts).forEach(([constructorId, count]) => {
+            if (count > maxCount) {
+                maxCount = count;
+                if (constructorsMap[constructorId]) {
+                    teamName = constructorsMap[constructorId].name;
+                }
+            }
+        });
+        
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="position">${index + 1}</td>
+            <td class="driver-name">${item.driver.fullName}</td>
+            <td class="team-name">${teamName}</td>
+            <td class="points">${item.points}</td>
+            <td class="wins">${item.wins}</td>
+        `;
+        
+        // Add fade-in animation
+        tr.style.opacity = '0';
+        tr.classList.add('fade-in');
+        setTimeout(() => {
+            tr.style.opacity = '1';
+        }, index * 30);
+        
+        tbody.appendChild(tr);
+    });
 }
 
 /**
