@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>F1 Drivers Career Dashboard</title>
+    <meta name="description" content="Explore every Formula 1 driver’s career: results, progression, and stats from debut to latest race. Interactive visual analysis.">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -71,7 +72,7 @@
             <a href="https://f1dashboards.com/dashboards/constructor-standings-dashboard/" class="nav-link">Constructors</a>
             <a href="https://f1dashboards.com/dashboards/drivers-career-dashboard/" class="nav-link active">Drivers</a>
             <a href="https://f1dashboards.com/dashboards/race-results-explorer/" class="nav-link">Races</a>
-            <a href="#" class="nav-link">Qualifying</a>
+            <a href="https://f1dashboards.com/dashboards/qualifying-performance-dashboard/" class="nav-link">Qualifying</a>
             <a href="#" class="nav-link">Pit Stop Analysis</a>
             <a href="#" class="nav-link">Circuit Insights</a>
           </div>
@@ -95,7 +96,7 @@
         <a href="https://f1dashboards.com/dashboards/constructor-standings-dashboard/" class="mobile-menu-link">Constructors</a>
         <a href="https://f1dashboards.com/dashboards/drivers-career-dashboard/" class="mobile-menu-link active">Drivers</a>
         <a href="https://f1dashboards.com/dashboards/race-results-explorer/" class="mobile-menu-link">Races</a>
-        <a href="#" class="mobile-menu-link">Qualifying</a>
+        <a href="https://f1dashboards.com/dashboards/qualifying-performance-dashboard/" class="mobile-menu-link">Qualifying</a>
         <a href="#" class="mobile-menu-link">Pit Stop Analysis</a>
         <a href="#" class="mobile-menu-link">Circuit Insights</a>
       </div>
@@ -147,7 +148,8 @@
       <div class="driver-profile" id="driverProfile" style="display: none">
         <div class="profile-header">
           <div class="driver-avatar">
-            <div class="avatar-placeholder">
+            <div class="avatar-placeholder" id="avatarPlaceholder">
+              <img id="driverImage" src="" alt="" style="display: none;">
               <span id="driverInitials">--</span>
             </div>
           </div>
@@ -294,6 +296,7 @@
           >
         </p>
         <p>© 2025 F1Dashboards.com. Made with ❤️ for F1 fans.</p>
+        <p>Driver illustrations are AI-generated, unofficial, and not affiliated with F1, FIA, any team or driver. Images are not intended as accurate likenesses.</p>
       </div>
     </footer>
 
