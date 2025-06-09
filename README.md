@@ -22,12 +22,12 @@ Currently live:
 - **Drivers Career Dashboard**  
   Explore F1 driver careers, season results, wins, podiums, and teams.
 
-Coming soon:
 - **Race Results Explorer**  
   Analyze race-by-race results, filter by circuit, driver, or constructor.
 
-Additional dashboards (planned):
 - **Qualifying Performance**
+
+Additional dashboards (planned):
 - **Pit Stop Analysis**
 - **Circuit Insights**
 
@@ -69,10 +69,13 @@ README.md       # Project documentation
 
 ## 📝 Credits & License
 
-- Data: [Kaggle F1 Dataset](https://www.kaggle.com/datasets), Ergast API, Wikipedia (for post-2024 manual updates)
-- Logo & graphics: by Francesco Saviano 
-- Dashboard code: MIT License 
-- This site is an independent, non-commercial project not affiliated with Formula 1 Group.
+- **Data:** Kaggle F1 Dataset, Ergast API, Wikipedia (for post-2024 manual updates)
+- **Logo & graphics:** by Francesco Saviano
+- **Dashboard code:** MIT License
+
+**Attribution is not required, but if you find this project useful and decide to use or share its content, please consider crediting [F1 Dashboards](https://f1dashboards.com) and Francesco Saviano. Your support helps keep the project open and growing!**
+
+*This site is an independent, non-commercial project and is not affiliated with Formula 1 Group, FIA, or any F1 teams.*
 
 ---
 
