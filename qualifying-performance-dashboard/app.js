@@ -930,14 +930,25 @@ function updatePolePositionsChart() {
         .map(([driverId, count]) => {
             const driver = driversMap[driverId];
             // Find the driver's main team for the season
-            const driverQualifying = season.qualifying.filter(q => q.driverId === driverId);
+            const driverQualifying = season.qualifying.filter(q => q.driverId == driverId);
             const teamCounts = {};
             driverQualifying.forEach(q => {
-                teamCounts[q.constructorId] = (teamCounts[q.constructorId] || 0) + 1;
+                if (q.constructorId) {
+                    teamCounts[q.constructorId] = (teamCounts[q.constructorId] || 0) + 1;
+                }
             });
-            const mainTeamId = Object.entries(teamCounts)
-                .sort(([,a], [,b]) => b - a)[0]?.[0];
-            const mainTeam = constructorsMap[mainTeamId];
+            
+            // Get the most common team
+            let mainTeamId = null;
+            let maxCount = 0;
+            Object.entries(teamCounts).forEach(([constructorId, teamCount]) => {
+                if (teamCount > maxCount) {
+                    maxCount = teamCount;
+                    mainTeamId = constructorId;
+                }
+            });
+            
+            const mainTeam = mainTeamId ? constructorsMap[mainTeamId] : null;
             
             return {
                 driver: driver?.surname || 'Unknown',
