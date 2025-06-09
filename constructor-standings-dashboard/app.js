@@ -18,6 +18,7 @@ let processedDriverData = {};   // Processed driver data by year
 let selectedTeams = new Set();  // Currently selected teams for chart
 let allYears = [];              // All available years
 let resultsData = [];           // Raw results data for driver-team relationships
+let currentYear = null;         // Currently selected year
 
 // File paths for CSV data
 const DATA_PATH = 'data/';
@@ -301,9 +302,39 @@ function initializeUI() {
     
     // Select the most recent year by default
     if (allYears.length > 0) {
-        document.getElementById('seasonSelect').value = allYears[0];
+        currentYear = allYears[0];
+        updateYearDisplay();
         updateDashboard();
     }
+}
+
+/**
+ * Navigate between years
+ */
+function navigateYear(direction) {
+    const currentIndex = allYears.indexOf(currentYear);
+    const newIndex = currentIndex - direction; // Inverted: subtract direction instead of add
+    
+    if (newIndex >= 0 && newIndex < allYears.length) {
+        currentYear = allYears[newIndex];
+        updateYearDisplay();
+        updateDashboard();
+    }
+}
+
+/**
+ * Update year display
+ */
+function updateYearDisplay() {
+    document.getElementById('yearDisplay').textContent = currentYear;
+    document.getElementById('seasonSelect').value = currentYear;
+    
+    // Update navigation buttons
+    const currentIndex = allYears.indexOf(currentYear);
+    // Left button disabled when at oldest year (end of array)
+    document.getElementById('prevYearBtn').disabled = currentIndex === allYears.length - 1;
+    // Right button disabled when at newest year (start of array)
+    document.getElementById('nextYearBtn').disabled = currentIndex === 0;
 }
 
 /**
@@ -325,8 +356,16 @@ function populateSeasonSelector() {
  * Setup event listeners
  */
 function setupEventListeners() {
-    // Season selector change
-    document.getElementById('seasonSelect').addEventListener('change', updateDashboard);
+    // Year navigation
+    document.getElementById('prevYearBtn').addEventListener('click', () => navigateYear(-1));
+    document.getElementById('nextYearBtn').addEventListener('click', () => navigateYear(1));
+    document.getElementById('seasonSelect').addEventListener('change', (e) => {
+        if (e.target.value) {
+            currentYear = parseInt(e.target.value);
+            updateYearDisplay();
+            updateDashboard();
+        }
+    });
     
     // Chart type selector
     document.getElementById('chartType').addEventListener('change', updateChart);
@@ -386,13 +425,12 @@ function setupEventListeners() {
  * Update the entire dashboard when season changes
  */
 function updateDashboard() {
-    const selectedYear = document.getElementById('seasonSelect').value;
-    if (!selectedYear) return;
+    if (!currentYear) return;
     
-    updateStandingsTable(selectedYear);
-    updateDriversTable(selectedYear);
-    updateTeamCheckboxes(selectedYear);
-    updateStatistics(selectedYear);
+    updateStandingsTable(currentYear);
+    updateDriversTable(currentYear);
+    updateTeamCheckboxes(currentYear);
+    updateStatistics(currentYear);
     updateChart();
 }
 
@@ -671,7 +709,7 @@ function updateChart() {
         return;
     }
     
-    const selectedYear = document.getElementById('seasonSelect').value;
+    const selectedYear = currentYear;
     if (!selectedYear) return;
     
     const chartType = document.getElementById('chartType').value;

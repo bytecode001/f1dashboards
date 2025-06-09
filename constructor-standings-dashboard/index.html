@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>F1 Constructor Standings Dashboard</title>
-    <meta name="description" content="Compare F1 team standings by season. Track constructors’ performance, points and championship evolution from 1950 to today.">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -113,11 +112,24 @@
           discover key statistics about each championship season.
         </p>
       </div>
-      <!-- Season Selector -->
-      <div class="season-selector">
-        <h2>Select Season</h2>
-        <div class="select-wrapper">
-          <select id="seasonSelect">
+      <!-- Year Selector Section -->
+      <div class="year-selector-section">
+        <div class="year-selector-card">
+          <h2>Select Season</h2>
+          <div class="year-selector-wrapper">
+            <button class="year-nav-btn" id="prevYearBtn" aria-label="Previous year">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+            </button>
+            <div class="year-display" id="yearDisplay">2024</div>
+            <button class="year-nav-btn" id="nextYearBtn" aria-label="Next year">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+          </div>
+          <select id="seasonSelect" class="year-dropdown">
             <option value="">Loading seasons...</option>
           </select>
         </div>
