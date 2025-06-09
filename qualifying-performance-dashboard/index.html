@@ -1,1 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qualifying Performance Dashboard - F1Dashboards</title>
+    <meta name="description" content="Analyze Formula 1 qualifying performance, pole positions, and grid penalties. Explore Q1, Q2, Q3 times and session outcomes.">
 
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Plotly.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.27.0/plotly.min.js"></script>
+    <script>
+        // Plotly fallback
+        if (typeof Plotly === 'undefined') {
+            var script = document.createElement('script');
+            script.src = 'libs/plotly.min.js';
+            document.head.appendChild(script);
+        }
+    </script>
+    
+    <!-- PapaParse CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script>
+        // PapaParse fallback
+        if (typeof Papa === 'undefined') {
+            var script = document.createElement('script');
+            script.src = 'libs/papaparse.min.js';
+            document.head.appendChild(script);
+        }
+    </script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loader" id="loader">
+        <div class="loader-content">
+            <div class="loader-circle"></div>
+            <p class="loader-text">Loading Qualifying Data...</p>
+        </div>
+    </div>
+    
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <nav class="nav-menu">
+                <a href="/" class="home-icon" title="Home">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                </a>
+                
+                <div class="nav-links">
+                    <a href="https://f1dashboards.com/dashboards/constructor-standings-dashboard/" class="nav-link">Constructors</a>
+                    <a href="https://f1dashboards.com/dashboards/drivers-career-dashboard/" class="nav-link">Drivers</a>
+                    <a href="https://f1dashboards.com/dashboards/race-results-explorer/" class="nav-link">Races</a>
+                    <a href="https://f1dashboards.com/dashboards/qualifying-performance-dashboard/" class="nav-link active">Qualifying</a>
+                    <a href="#" class="nav-link">Pit Stop Analysis</a>
+                    <a href="#" class="nav-link">Circuit Insights</a>
+                </div>
+                
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </nav>
+            
+            <a href="/" class="logo">F1 Dashboards</a>
+        </div>
+    </header>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-content">
+            <a href="https://f1dashboards.com/dashboards/constructor-standings-dashboard/" class="mobile-menu-link">Constructors</a>
+            <a href="https://f1dashboards.com/dashboards/drivers-career-dashboard/" class="mobile-menu-link">Drivers</a>
+            <a href="https://f1dashboards.com/dashboards/race-results-explorer/" class="mobile-menu-link">Races</a>
+            <a href="https://f1dashboards.com/dashboards/qualifying-performance-dashboard/" class="mobile-menu-link active">Qualifying</a>
+            <a href="#" class="mobile-menu-link">Pit Stop Analysis</a>
+            <a href="#" class="mobile-menu-link">Circuit Insights</a>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <h1>Qualifying Performance Dashboard</h1>
+            <p>Analyze Formula 1 qualifying sessions, pole positions, and grid performance. Explore Q1, Q2, and Q3 lap times to understand team and driver qualifying pace throughout the season.</p>
+        </div>
+        
+        <!-- Controls Section -->
+        <div class="controls-section">
+            <!-- Season Selector -->
+            <div class="control-card">
+                <h2>Select Season</h2>
+                <div class="year-selector-wrapper">
+                    <button class="year-nav-btn" id="prevYearBtn" aria-label="Previous year">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <div class="year-display" id="yearDisplay">2024</div>
+                    <button class="year-nav-btn" id="nextYearBtn" aria-label="Next year">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </button>
+                </div>
+                <select id="yearSelect" class="year-dropdown">
+                    <option value="">Loading...</option>
+                </select>
+            </div>
+            
+            <!-- Race Selector -->
+            <div class="control-card">
+                <h2>Select Grand Prix</h2>
+                <select id="raceSelect" class="race-select">
+                    <option value="">All Races</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Season Statistics -->
+        <div class="stats-grid" id="seasonStats">
+            <div class="stat-card">
+                <h4>Total Races</h4>
+                <p class="stat-value" id="totalRaces">-</p>
+            </div>
+            <div class="stat-card">
+                <h4>Pole Sitter</h4>
+                <p class="stat-value stat-small" id="topPoleSitter">-</p>
+            </div>
+            <div class="stat-card">
+                <h4>Different Pole Winners</h4>
+                <p class="stat-value" id="differentPoleWinners">-</p>
+            </div>
+            <div class="stat-card" id="q3StatsCard">
+                <h4>Average Q3 Participants</h4>
+                <p class="stat-value" id="avgQ3Participants">-</p>
+            </div>
+        </div>
+        
+        <!-- Qualifying System Info -->
+        <div class="qualifying-info" id="qualifyingInfo">
+            <p class="info-text"></p>
+        </div>
+        
+        <!-- Qualifying Results Section -->
+        <div class="qualifying-results-section" id="qualifyingResultsSection">
+            <div class="section-header">
+                <h2 id="resultsTitle">Qualifying Results</h2>
+            </div>
+            
+
+            
+            <!-- Results Table -->
+            <div class="results-card">
+                <div class="table-wrapper">
+                    <table class="results-table" id="resultsTable">
+                        <thead>
+                            <tr>
+                                <th>Pos</th>
+                                <th>Driver</th>
+                                <th>Constructor</th>
+                                <th>Q1</th>
+                                <th>Q2</th>
+                                <th>Q3</th>
+                                <th>Gap</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody">
+                            <tr>
+                                <td colspan="7" class="no-data">Select a race to view qualifying results</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Analysis Section -->
+        <div class="analysis-grid">
+            <!-- Pole Positions Chart -->
+            <div class="chart-card full-width">
+                <h3>Pole Positions by Driver</h3>
+                <div id="polePositionsChart" class="plotly-chart-small"></div>
+            </div>
+        </div>
+        
+        <!-- Team Performance Analysis -->
+        <div class="chart-card">
+            <h3>Team Qualifying Performance</h3>
+            <div id="teamPerformanceChart" class="plotly-chart"></div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <p>Powered by <a href="https://plotly.com/javascript/" target="_blank">Plotly.js</a> • Visualization by <a href="https://f1dashboards.com/about" target="_blank">Francesco Saviano</a></p>
+            <p>Data © <a href="https://www.kaggle.com/rohanrao" target="_blank">Rohan Rao</a> (<a href="https://www.kaggle.com/datasets/rohanrao/formula-1-world-championship-1950-2020" target="_blank">Kaggle: vopani</a>) – Based on the <a href="http://ergast.com/mrd/" target="_blank">Ergast Developer API</a></p>
+            <p>© 2025 F1Dashboards.com. Made with ❤️ for F1 fans.</p>
+        </div>
+    </footer>
+    
+    <!-- Custom JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>
