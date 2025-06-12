@@ -381,9 +381,6 @@ function setupEventListeners() {
         }
     });
     
-    // Chart type selector
-    document.getElementById('chartType').addEventListener('change', updateChart);
-    
     // Select/Clear all buttons
     document.getElementById('selectAllBtn').addEventListener('click', selectAllTeams);
     document.getElementById('clearAllBtn').addEventListener('click', clearAllTeams);
@@ -607,7 +604,20 @@ function updateStatistics(year) {
             constructor: constructorsMap[constructorId]
         }))
         .filter(item => item.constructor)
-        .sort((a, b) => b.points - a.points)[0];
+        .sort((a, b) => {
+            // Special handling for 2007 - McLaren was disqualified
+            if (year == 2007) {
+                const aMcLaren = a.constructor.name === 'McLaren';
+                const bMcLaren = b.constructor.name === 'McLaren';
+                
+                // McLaren cannot be champion in 2007
+                if (aMcLaren) return 1;
+                if (bMcLaren) return -1;
+            }
+            
+            // Normal sorting by points
+            return b.points - a.points;
+        })[0];
     
     // Count total races
     const totalRaces = Object.keys(raceYearMap)
@@ -759,7 +769,6 @@ function updateChart() {
     const selectedYear = currentYear;
     if (!selectedYear) return;
     
-    const chartType = document.getElementById('chartType').value;
     const traces = [];
     
     // Define team colors
@@ -877,7 +886,7 @@ function updateChart() {
                 x: raceNames,
                 y: points,
                 type: 'scatter',
-                mode: chartType === 'area' ? 'lines' : 'lines+markers',
+                mode: 'lines+markers',
                 name: constructor.name,
                 line: {
                     color: color,
@@ -891,11 +900,6 @@ function updateChart() {
                 hovertemplate: '%{text}<extra></extra>',
                 connectgaps: false
             };
-            
-            if (chartType === 'area') {
-                trace.fill = 'tozeroy';
-                trace.fillcolor = color + '30'; // Add transparency
-            }
             
             traces.push(trace);
         }

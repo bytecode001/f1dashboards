@@ -637,19 +637,7 @@ header {
 .chart-container h3 {
     font-family: 'Russo One', sans-serif;
     font-size: 1.25rem;
-    margin-bottom: 1rem;
-}
-
-.chart-controls {
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.chart-controls label {
-    color: var(--text-secondary);
-    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
 }
 
 #plotly-chart {
