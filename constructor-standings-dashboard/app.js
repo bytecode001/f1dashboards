@@ -280,17 +280,31 @@ function processStandingsData(data) {
             processedData[year] = {};
             
             standingsByRace[lastRaceId].forEach(standing => {
+                // Store the actual position from the data, but we'll sort by points for display
                 processedData[year][standing.constructorId] = {
                     constructorId: standing.constructorId,
                     points: standing.points || 0,
                     wins: standing.wins || 0,
-                    position: standing.position || 999
+                    position: standing.position || 999,
+                    // Store original position for reference (e.g., McLaren 2007 might have position 999 or similar)
+                    originalPosition: standing.position
                 };
             });
         }
     });
     
     console.log(`Processed standings for ${Object.keys(processedData).length} years`);
+    
+    // Debug 2007 specifically
+    if (processedData[2007]) {
+        console.log('2007 Constructor standings data:');
+        Object.entries(processedData[2007]).forEach(([constructorId, data]) => {
+            const constructor = constructorsMap[constructorId];
+            if (constructor) {
+                console.log(`${constructor.name}: ${data.points} points, position: ${data.position}`);
+            }
+        });
+    }
 }
 
 /**
@@ -455,12 +469,33 @@ function updateStandingsTable(year) {
         }))
         .filter(item => item.constructor) // Filter out any missing constructors
         .sort((a, b) => {
-            // First sort by position if available
-            if (a.position !== b.position) {
+            // Special handling for McLaren 2007 (Spygate disqualification)
+            // They had points but were excluded from the championship
+            if (year == 2007) {
+                const aMcLaren = a.constructor.name === 'McLaren';
+                const bMcLaren = b.constructor.name === 'McLaren';
+                
+                // If one is McLaren and the other isn't, McLaren goes last
+                if (aMcLaren && !bMcLaren) return 1;
+                if (!aMcLaren && bMcLaren) return -1;
+            }
+            
+            // First sort by points (descending) - this is the primary criteria
+            if (b.points !== a.points) {
+                return b.points - a.points;
+            }
+            
+            // If points are equal, sort by wins
+            if (b.wins !== a.wins) {
+                return b.wins - a.wins;
+            }
+            
+            // If still equal, use position if available (but this should be a fallback)
+            if (a.position && b.position && a.position !== 999 && b.position !== 999) {
                 return a.position - b.position;
             }
-            // Then by points (descending)
-            return b.points - a.points;
+            
+            return 0;
         });
     
     // Update table body
@@ -469,18 +504,30 @@ function updateStandingsTable(year) {
     
     sortedConstructors.forEach((item, index) => {
         const tr = document.createElement('tr');
+        
+        // Special handling for McLaren 2007
+        const displayPosition = (year == 2007 && item.constructor.name === 'McLaren') 
+            ? 'DSQ' 
+            : (index + 1);
+        
         tr.innerHTML = `
-            <td class="position">${index + 1}</td>
+            <td class="position">${displayPosition}</td>
             <td class="constructor-name">${item.constructor.name}</td>
             <td class="points">${item.points}</td>
             <td class="wins">${item.wins}</td>
         `;
         
+        // Add special styling for disqualified teams
+        if (displayPosition === 'DSQ') {
+            tr.style.opacity = '0.6';
+            tr.style.textDecoration = 'line-through';
+        }
+        
         // Add fade-in animation
         tr.style.opacity = '0';
         tr.classList.add('fade-in');
         setTimeout(() => {
-            tr.style.opacity = '1';
+            tr.style.opacity = displayPosition === 'DSQ' ? '0.6' : '1';
         }, index * 50);
         
         tbody.appendChild(tr);
