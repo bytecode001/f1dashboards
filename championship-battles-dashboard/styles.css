@@ -1055,6 +1055,10 @@ footer {
         order: 3;
         margin-top: 1rem;
     }
+    
+    .standings-container {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 768px) {
@@ -1137,6 +1141,10 @@ footer {
     
     .vs-text {
         font-size: 1.25rem;
+    }
+    
+    .standings-container {
+        grid-template-columns: 1fr;
     }
     
     .footer-content {
