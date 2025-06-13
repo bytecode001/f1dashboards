@@ -28,7 +28,7 @@ Currently live:
 - **Qualifying Performance**
 
 Additional dashboards (planned):
-- **Pit Stop Analysis**
+- **Championship Battles Dashboard**
 - **Circuit Insights**
 
 *(Dashboard coverage depends on available and up-to-date open data.)*
