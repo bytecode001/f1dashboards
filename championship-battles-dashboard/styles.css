@@ -1,0 +1,1165 @@
+/* F1 Championship Battles Dashboard - Custom Styles */
+
+:root {
+    /* Color Variables */
+    --primary-bg: #1a1a2e;
+    --secondary-bg: #15151e;
+    --accent: #ff1801;
+    --accent-hover: #ff3520;
+    --text-primary: #ffffff;
+    --text-secondary: #b8b8b8;
+    --card-bg: rgba(21, 21, 30, 0.7);
+    --border-color: rgba(255, 255, 255, 0.1);
+    
+    /* Championship Colors */
+    --champion-gold: #FFD700;
+    --silver: #C0C0C0;
+    --bronze: #CD7F32;
+    --success: #00D2BE;
+    --danger: #DC0000;
+    
+    /* Spacing and Layout */
+    --border-radius: 12px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --header-height: 80px;
+    --container-width: 1400px;
+}
+
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background-color: var(--primary-bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+/* Loading Screen */
+.loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--primary-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s, visibility 0.5s;
+}
+
+.loader.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.loader-content {
+    text-align: center;
+}
+
+.loader-circle {
+    width: 60px;
+    height: 60px;
+    border: 3px solid var(--secondary-bg);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+.loader-text {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Header Styles */
+header {
+    background-color: var(--secondary-bg);
+    height: var(--header-height);
+    position: sticky;
+    top: 0;
+    z-index: 500;
+    backdrop-filter: blur(10px);
+    background-color: rgba(21, 21, 30, 0.95);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+}
+
+.header-container {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 0 2rem;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Navigation Menu */
+.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.home-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    transition: var(--transition);
+    padding: 0.5rem;
+    border-radius: 8px;
+}
+
+.home-icon:hover {
+    color: var(--accent);
+    background-color: rgba(255, 24, 1, 0.1);
+}
+
+.home-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: var(--transition);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    position: relative;
+}
+
+.nav-link:hover {
+    color: var(--text-primary);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.nav-link.active {
+    color: var(--accent);
+}
+
+.nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 3px;
+    background-color: var(--accent);
+    border-radius: 2px;
+}
+
+.logo {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.8rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    position: relative;
+    transition: var(--transition);
+}
+
+.logo::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background-color: var(--accent);
+    transition: width 0.3s;
+}
+
+.logo:hover::after {
+    width: 100%;
+}
+
+/* Mobile Menu Toggle */
+.mobile-menu-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.mobile-menu-toggle span {
+    width: 24px;
+    height: 2px;
+    background-color: var(--text-primary);
+    transition: var(--transition);
+}
+
+.mobile-menu-toggle.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.mobile-menu-toggle.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.mobile-menu-toggle.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* Mobile Menu */
+.mobile-menu {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    background-color: var(--secondary-bg);
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
+    z-index: 400;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-menu.active {
+    transform: translateY(0);
+}
+
+.mobile-menu-content {
+    padding: 1rem;
+}
+
+.mobile-menu-link {
+    display: block;
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: var(--transition);
+    border-radius: 8px;
+}
+
+.mobile-menu-link:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+.mobile-menu-link.active {
+    color: var(--accent);
+    background-color: rgba(255, 24, 1, 0.1);
+}
+
+/* Main Container */
+.main-container {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Hero Section */
+.hero-section {
+    text-align: center;
+    margin-bottom: 3rem;
+    animation: slideIn 0.5s ease-out;
+}
+
+.hero-section h1 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 2.5rem;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.hero-section p {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.8;
+}
+
+/* Year Selector Section */
+.year-selector-section {
+    margin-bottom: 3rem;
+    animation: slideIn 0.6s ease-out;
+}
+
+.year-selector-card {
+    background-color: var(--card-bg);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.year-selector-card h2 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-secondary);
+}
+
+.year-selector-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.year-nav-btn {
+    background: none;
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--accent);
+}
+
+.year-nav-btn:hover {
+    background-color: var(--accent);
+    color: var(--text-primary);
+    transform: scale(1.1);
+}
+
+.year-nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.year-nav-btn:disabled:hover {
+    background: none;
+    transform: none;
+    color: var(--accent);
+}
+
+.year-display {
+    font-family: 'Russo One', sans-serif;
+    font-size: 4rem;
+    color: var(--accent);
+    font-weight: bold;
+    min-width: 200px;
+}
+
+.year-dropdown {
+    width: 200px;
+    padding: 0.75rem 1rem;
+    background-color: var(--secondary-bg);
+    color: var(--text-primary);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    appearance: none;
+    transition: var(--transition);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ff1801' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+    margin: 0 auto;
+    display: block;
+}
+
+.year-dropdown:hover {
+    border-color: var(--accent);
+}
+
+.year-dropdown:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(255, 24, 1, 0.2);
+}
+
+/* Champion Section */
+.champion-section {
+    margin-bottom: 3rem;
+    animation: slideIn 0.7s ease-out;
+}
+
+.champion-card {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, var(--card-bg) 100%);
+    padding: 2.5rem;
+    border-radius: var(--border-radius);
+    border: 2px solid var(--champion-gold);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.champion-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+    animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(0.8); opacity: 0.5; }
+    50% { transform: scale(1.2); opacity: 0.8; }
+}
+
+.champion-header {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.trophy-icon {
+    font-size: 4rem;
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.5));
+}
+
+.champion-name {
+    font-family: 'Russo One', sans-serif;
+    font-size: 2.5rem;
+    color: var(--champion-gold);
+    margin-bottom: 0.5rem;
+}
+
+.champion-team {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+}
+
+.champion-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.champion-stats .stat {
+    text-align: center;
+    padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    transition: var(--transition);
+}
+
+.champion-stats .stat:hover {
+    transform: translateY(-5px);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.stat-value {
+    display: block;
+    font-family: 'Russo One', sans-serif;
+    font-size: 2rem;
+    color: var(--champion-gold);
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Season Description Card */
+.season-description-card {
+    background-color: var(--card-bg);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+}
+
+.season-description-card h3 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
+}
+
+.season-description-text {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: var(--text-primary);
+}
+
+/* Contenders Section */
+.contenders-section {
+    margin-bottom: 3rem;
+    animation: slideIn 0.8s ease-out;
+}
+
+.contenders-section h2 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+}
+
+.contenders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.contender-card {
+    background-color: var(--card-bg);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    transition: var(--transition);
+    position: relative;
+}
+
+.contender-card.position-1 {
+    border-color: var(--champion-gold);
+}
+
+.contender-card.position-2 {
+    border-color: var(--silver);
+}
+
+.contender-card.position-3 {
+    border-color: var(--bronze);
+}
+
+.contender-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.contender-position {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-family: 'Russo One', sans-serif;
+    font-size: 2rem;
+    opacity: 0.3;
+}
+
+.position-1 .contender-position {
+    color: var(--champion-gold);
+}
+
+.position-2 .contender-position {
+    color: var(--silver);
+}
+
+.position-3 .contender-position {
+    color: var(--bronze);
+}
+
+.contender-name {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.contender-team {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+}
+
+.contender-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.contender-stat {
+    text-align: center;
+    padding: 0.75rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+}
+
+.contender-stat-value {
+    display: block;
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.25rem;
+    color: var(--accent);
+}
+
+.contender-stat-label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 0.25rem;
+}
+
+/* Battle Statistics Section */
+.battle-stats-section {
+    margin-bottom: 3rem;
+    animation: slideIn 0.9s ease-out;
+}
+
+.battle-stats-section h2 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+}
+
+.battle-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.battle-stat-card {
+    background-color: var(--secondary-bg);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+    border: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+
+.battle-stat-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent);
+}
+
+.battle-stat-card h4 {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.75rem;
+}
+
+.battle-stat-value {
+    font-family: 'Russo One', sans-serif;
+    font-size: 2.5rem;
+    color: var(--accent);
+    margin-bottom: 0.25rem;
+}
+
+.battle-stat-label {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+/* Charts Section */
+.charts-section {
+    margin-bottom: 3rem;
+    animation: slideIn 1s ease-out;
+}
+
+.charts-section h2 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+}
+
+.chart-card {
+    background-color: var(--card-bg);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    margin-bottom: 2rem;
+}
+
+.chart-card h3 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.chart-description {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+}
+
+.plotly-chart {
+    width: 100%;
+    height: 450px;
+    min-height: 450px;
+}
+
+/* Head to Head Section */
+.head-to-head-section {
+    margin-bottom: 3rem;
+    animation: slideIn 1.1s ease-out;
+}
+
+.head-to-head-section h2 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+}
+
+.h2h-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.h2h-dropdown {
+    width: 250px;
+    padding: 0.75rem 1rem;
+    background-color: var(--secondary-bg);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    appearance: none;
+    transition: var(--transition);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ff1801' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+}
+
+.h2h-dropdown:hover {
+    border-color: var(--accent);
+}
+
+.h2h-dropdown:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(255, 24, 1, 0.2);
+}
+
+.vs-text {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.5rem;
+    color: var(--accent);
+}
+
+.h2h-stats {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 2rem;
+    align-items: center;
+}
+
+.h2h-driver-card {
+    background-color: var(--card-bg);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.h2h-driver-card h4 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--accent);
+}
+
+.h2h-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.h2h-stat {
+    padding: 0.75rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+}
+
+.h2h-value {
+    display: block;
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+}
+
+.h2h-label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 0.25rem;
+}
+
+.h2h-comparison {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.h2h-bar-container {
+    text-align: center;
+}
+
+.h2h-bar-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.h2h-bar {
+    height: 30px;
+    background-color: var(--secondary-bg);
+    border-radius: 15px;
+    overflow: hidden;
+    display: flex;
+    position: relative;
+}
+
+.h2h-bar-fill {
+    height: 100%;
+    transition: width 0.5s ease-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.h2h-bar-1 {
+    background-color: var(--accent);
+    border-radius: 15px 0 0 15px;
+}
+
+.h2h-bar-2 {
+    background-color: var(--success);
+    border-radius: 0 15px 15px 0;
+}
+
+/* Final Standings Section */
+.final-standings-section {
+    margin-bottom: 3rem;
+    animation: slideIn 1.2s ease-out;
+}
+
+.final-standings-section h2 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+}
+
+.standings-container {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 2rem;
+}
+
+.standings-table-wrapper {
+    background-color: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+}
+
+.standings-table-wrapper h3 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: var(--accent);
+}
+
+.table-scroll {
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.standings-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.standings-table th {
+    text-align: left;
+    padding: 0.75rem;
+    border-bottom: 2px solid var(--accent);
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: sticky;
+    top: 0;
+    background-color: var(--card-bg);
+    z-index: 10;
+}
+
+.standings-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+
+.standings-table tr:hover td {
+    background-color: rgba(255, 24, 1, 0.05);
+}
+
+.standings-table .position-1 {
+    color: var(--champion-gold);
+    font-weight: 700;
+}
+
+.standings-table .position-2 {
+    color: var(--silver);
+    font-weight: 600;
+}
+
+.standings-table .position-3 {
+    color: var(--bronze);
+    font-weight: 600;
+}
+
+.standings-table .no-data {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 2rem;
+}
+
+/* Footer */
+footer {
+    background-color: var(--secondary-bg);
+    padding: 2rem 0;
+    margin-top: 4rem;
+    text-align: center;
+}
+
+.footer-content {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 0 2rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.footer-content p {
+    margin: 0.5rem 0;
+}
+
+.footer-content a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: opacity 0.3s;
+}
+
+.footer-content a:hover {
+    opacity: 0.8;
+}
+
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--secondary-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-hover);
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .nav-links {
+        gap: 1rem;
+    }
+    
+    .nav-link {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .year-display {
+        font-size: 3rem;
+    }
+    
+    .champion-name {
+        font-size: 2rem;
+    }
+    
+    .contenders-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .h2h-stats {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .h2h-comparison {
+        order: 3;
+        margin-top: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-container {
+        padding: 1rem;
+    }
+    
+    .nav-links {
+        display: none;
+    }
+    
+    .mobile-menu-toggle {
+        display: flex;
+    }
+    
+    .logo {
+        font-size: 1.5rem;
+    }
+    
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+    
+    .hero-section p {
+        font-size: 1rem;
+        padding: 0 1rem;
+    }
+    
+    .main-container {
+        padding: 1rem;
+    }
+    
+    .year-selector-wrapper {
+        gap: 1rem;
+    }
+    
+    .year-display {
+        font-size: 2.5rem;
+        min-width: 150px;
+    }
+    
+    .year-nav-btn {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .champion-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .trophy-icon {
+        font-size: 3rem;
+    }
+    
+    .champion-name {
+        font-size: 1.75rem;
+    }
+    
+    .champion-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .battle-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .plotly-chart {
+        height: 350px;
+    }
+    
+    .h2h-selector {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .h2h-dropdown {
+        width: 100%;
+    }
+    
+    .vs-text {
+        font-size: 1.25rem;
+    }
+    
+    .footer-content {
+        padding: 0 1rem;
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .champion-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .battle-stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .contender-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .h2h-stat-grid {
+        grid-template-columns: 1fr;
+    }
+}
+    

@@ -1,1 +1,371 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Championship Battles Dashboard - F1Dashboards</title>
+    <meta name="description" content="Explore historic Formula 1 championship battles year by year. Analyze title fights, rivalries, and key moments that defined each season.">
+    <meta name="keywords" content="F1 championship battles, Formula 1 title fights, F1 rivalries, championship evolution, F1 history, drivers championship, F1 data analysis" />
+    
+    <link rel="canonical" href="https://f1dashboards.com/dashboards/championship-battles-dashboard/" />
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Plotly.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.27.0/plotly.min.js"></script>
+    <script>
+        // Plotly fallback
+        if (typeof Plotly === 'undefined') {
+            var script = document.createElement('script');
+            script.src = 'libs/plotly.min.js';
+            document.head.appendChild(script);
+        }
+    </script>
+    
+    <!-- PapaParse CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script>
+        // PapaParse fallback
+        if (typeof Papa === 'undefined') {
+            var script = document.createElement('script');
+            script.src = 'libs/papaparse.min.js';
+            document.head.appendChild(script);
+        }
+    </script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loader" id="loader">
+        <div class="loader-content">
+            <div class="loader-circle"></div>
+            <p class="loader-text">Loading Championship Data...</p>
+        </div>
+    </div>
+    
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <nav class="nav-menu">
+                <a href="/" class="home-icon" title="Home">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                </a>
+                
+                <div class="nav-links">
+                    <a href="https://f1dashboards.com/dashboards/constructor-standings-dashboard/" class="nav-link">Constructors</a>
+                    <a href="https://f1dashboards.com/dashboards/drivers-career-dashboard/" class="nav-link">Drivers</a>
+                    <a href="https://f1dashboards.com/dashboards/race-results-explorer/" class="nav-link">Races</a>
+                    <a href="https://f1dashboards.com/dashboards/qualifying-performance-dashboard/" class="nav-link">Qualifying</a>
+                    <a href="https://f1dashboards.com/dashboards/championship-battles-dashboard/" class="nav-link active">Battles</a>
+                    <a href="#" class="nav-link">Circuit Insights</a>
+                </div>
+                
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </nav>
+            
+            <a href="/" class="logo">F1 Dashboards</a>
+        </div>
+    </header>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-content">
+            <a href="https://f1dashboards.com/dashboards/constructor-standings-dashboard/" class="mobile-menu-link">Constructors</a>
+            <a href="https://f1dashboards.com/dashboards/drivers-career-dashboard/" class="mobile-menu-link">Drivers</a>
+            <a href="https://f1dashboards.com/dashboards/race-results-explorer/" class="mobile-menu-link">Races</a>
+            <a href="https://f1dashboards.com/dashboards/qualifying-performance-dashboard/" class="mobile-menu-link">Qualifying</a>
+            <a href="https://f1dashboards.com/dashboards/championship-battles-dashboard/" class="mobile-menu-link active">Battles</a>
+            <a href="#" class="mobile-menu-link">Circuit Insights</a>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <h1>Championship Battles Dashboard</h1>
+            <p>Relive the greatest Formula 1 championship battles throughout history. Analyze how title fights unfolded race by race, explore legendary rivalries, and discover the moments that decided each championship.</p>
+        </div>
+        
+        <!-- Year Selector Section -->
+        <div class="year-selector-section">
+            <div class="year-selector-card">
+                <h2>Select Season</h2>
+                <div class="year-selector-wrapper">
+                    <button class="year-nav-btn" id="prevYearBtn" aria-label="Previous year">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <div class="year-display" id="yearDisplay">2024</div>
+                    <button class="year-nav-btn" id="nextYearBtn" aria-label="Next year">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </button>
+                </div>
+                <select id="yearSelect" class="year-dropdown">
+                    <option value="">Loading...</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Champion Section -->
+        <div class="champion-section" id="championSection" style="display: none;">
+            <div class="champion-card">
+                <div class="champion-header">
+                    <div class="trophy-icon">🏆</div>
+                    <div>
+                        <h2>World Champion</h2>
+                        <div class="champion-name" id="championName">-</div>
+                        <div class="champion-team" id="championTeam">-</div>
+                    </div>
+                </div>
+                <div class="champion-stats">
+                    <div class="stat">
+                        <span class="stat-value" id="championWins">-</span>
+                        <span class="stat-label">Wins</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="championPodiums">-</span>
+                        <span class="stat-label">Podiums</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="championPoles">-</span>
+                        <span class="stat-label">Poles</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="championPoints">-</span>
+                        <span class="stat-label">Points</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Season Description -->
+            <div class="season-description-card">
+                <h3>Season Overview</h3>
+                <p id="seasonDescription" class="season-description-text">-</p>
+            </div>
+        </div>
+        
+        <!-- Top 3 Contenders Section -->
+        <div class="contenders-section" id="contendersSection" style="display: none;">
+            <h2>Championship Contenders</h2>
+            <div class="contenders-grid" id="contendersGrid">
+                <!-- Contender cards will be populated here -->
+            </div>
+        </div>
+        
+        <!-- Battle Statistics Section -->
+        <div class="battle-stats-section" id="battleStatsSection" style="display: none;">
+            <h2>Championship Battle Statistics</h2>
+            <div class="battle-stats-grid">
+                <div class="battle-stat-card">
+                    <h4>Title Decided</h4>
+                    <p class="battle-stat-value" id="titleDecidedRace">-</p>
+                    <p class="battle-stat-label" id="titleDecidedLabel">-</p>
+                </div>
+                <div class="battle-stat-card">
+                    <h4>Final Margin</h4>
+                    <p class="battle-stat-value" id="finalMargin">-</p>
+                    <p class="battle-stat-label">points</p>
+                </div>
+                <div class="battle-stat-card">
+                    <h4>Lead Changes</h4>
+                    <p class="battle-stat-value" id="leadChanges">-</p>
+                    <p class="battle-stat-label">times</p>
+                </div>
+                <div class="battle-stat-card">
+                    <h4>Closest Gap</h4>
+                    <p class="battle-stat-value" id="closestGap">-</p>
+                    <p class="battle-stat-label">points</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Championship Evolution Charts -->
+        <div class="charts-section" id="chartsSection" style="display: none;">
+            <h2>Championship Evolution</h2>
+            
+            <!-- Points Evolution Chart -->
+            <div class="chart-card">
+                <h3>Points Evolution</h3>
+                <div id="pointsEvolutionChart" class="plotly-chart"></div>
+            </div>
+            
+            <!-- Points Gap Chart -->
+            <div class="chart-card">
+                <h3>Championship Gap</h3>
+                <p class="chart-description">Gap between leader and other contenders throughout the season</p>
+                <div id="pointsGapChart" class="plotly-chart"></div>
+            </div>
+            
+            <!-- Position Changes Chart -->
+            <div class="chart-card">
+                <h3>Championship Positions</h3>
+                <p class="chart-description">How championship positions changed race by race</p>
+                <div id="positionChart" class="plotly-chart"></div>
+            </div>
+        </div>
+        
+        <!-- Head to Head Section -->
+        <div class="head-to-head-section" id="headToHeadSection" style="display: none;">
+            <h2>Head-to-Head Comparison</h2>
+            <div class="h2h-selector">
+                <select id="h2hDriver1" class="h2h-dropdown">
+                    <option value="">Select Driver 1</option>
+                </select>
+                <span class="vs-text">VS</span>
+                <select id="h2hDriver2" class="h2h-dropdown">
+                    <option value="">Select Driver 2</option>
+                </select>
+            </div>
+            
+            <div class="h2h-stats" id="h2hStats" style="display: none;">
+                <div class="h2h-driver-card">
+                    <h4 id="h2hDriver1Name">-</h4>
+                    <div class="h2h-stat-grid">
+                        <div class="h2h-stat">
+                            <span class="h2h-value" id="h2h1Wins">-</span>
+                            <span class="h2h-label">Wins</span>
+                        </div>
+                        <div class="h2h-stat">
+                            <span class="h2h-value" id="h2h1Podiums">-</span>
+                            <span class="h2h-label">Podiums</span>
+                        </div>
+                        <div class="h2h-stat">
+                            <span class="h2h-value" id="h2h1Poles">-</span>
+                            <span class="h2h-label">Poles</span>
+                        </div>
+                        <div class="h2h-stat">
+                            <span class="h2h-value" id="h2h1Points">-</span>
+                            <span class="h2h-label">Points</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="h2h-comparison">
+                    <div class="h2h-bar-container">
+                        <div class="h2h-bar-label">Wins</div>
+                        <div class="h2h-bar">
+                            <div class="h2h-bar-fill h2h-bar-1" id="h2hBar1Wins"></div>
+                            <div class="h2h-bar-fill h2h-bar-2" id="h2hBar2Wins"></div>
+                        </div>
+                    </div>
+                    <div class="h2h-bar-container">
+                        <div class="h2h-bar-label">Qualifying</div>
+                        <div class="h2h-bar">
+                            <div class="h2h-bar-fill h2h-bar-1" id="h2hBar1Quali"></div>
+                            <div class="h2h-bar-fill h2h-bar-2" id="h2hBar2Quali"></div>
+                        </div>
+                    </div>
+                    <div class="h2h-bar-container">
+                        <div class="h2h-bar-label">Finishes Ahead</div>
+                        <div class="h2h-bar">
+                            <div class="h2h-bar-fill h2h-bar-1" id="h2hBar1Finishes"></div>
+                            <div class="h2h-bar-fill h2h-bar-2" id="h2hBar2Finishes"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="h2h-driver-card">
+                    <h4 id="h2hDriver2Name">-</h4>
+                    <div class="h2h-stat-grid">
+                        <div class="h2h-stat">
+                            <span class="h2h-value" id="h2h2Wins">-</span>
+                            <span class="h2h-label">Wins</span>
+                        </div>
+                        <div class="h2h-stat">
+                            <span class="h2h-value" id="h2h2Podiums">-</span>
+                            <span class="h2h-label">Podiums</span>
+                        </div>
+                        <div class="h2h-stat">
+                            <span class="h2h-value" id="h2h2Poles">-</span>
+                            <span class="h2h-label">Poles</span>
+                        </div>
+                        <div class="h2h-stat">
+                            <span class="h2h-value" id="h2h2Points">-</span>
+                            <span class="h2h-label">Points</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Final Standings Section -->
+        <div class="final-standings-section" id="finalStandingsSection" style="display: none;">
+            <h2>Final Championship Standings</h2>
+            <div class="standings-container">
+                <!-- Drivers Standings -->
+                <div class="standings-table-wrapper">
+                    <h3>Drivers' Championship - Top 10</h3>
+                    <div class="table-scroll">
+                        <table class="standings-table">
+                            <thead>
+                                <tr>
+                                    <th>Pos</th>
+                                    <th>Driver</th>
+                                    <th>Team</th>
+                                    <th>Points</th>
+                                    <th>Wins</th>
+                                </tr>
+                            </thead>
+                            <tbody id="driversStandingsBody">
+                                <tr>
+                                    <td colspan="5" class="no-data">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Constructors Standings -->
+                <div class="standings-table-wrapper">
+                    <h3>Constructors' Championship - Top 5</h3>
+                    <div class="table-scroll">
+                        <table class="standings-table">
+                            <thead>
+                                <tr>
+                                    <th>Pos</th>
+                                    <th>Constructor</th>
+                                    <th>Points</th>
+                                    <th>Wins</th>
+                                </tr>
+                            </thead>
+                            <tbody id="constructorsStandingsBody">
+                                <tr>
+                                    <td colspan="4" class="no-data">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <p>Powered by <a href="https://plotly.com/javascript/" target="_blank">Plotly.js</a> • Designed and developed by <a href="https://f1dashboards.com/about#author" target="_blank">Francesco Saviano</a></p>
+            <p>Data © <a href="https://www.kaggle.com/rohanrao" target="_blank">Rohan Rao</a> (<a href="https://www.kaggle.com/datasets/rohanrao/formula-1-world-championship-1950-2020" target="_blank">Kaggle: vopani</a>) – Based on the <a href="http://ergast.com/mrd/" target="_blank">Ergast Developer API</a></p>
+            <p>© 2025 F1Dashboards.com. Made with ❤️ for F1 fans.</p>
+        </div>
+    </footer>
+    
+    <!-- Custom JavaScript -->
+    <script type="module" src="app.js"></script>
+</body>
+</html>
