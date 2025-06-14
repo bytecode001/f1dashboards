@@ -70,7 +70,7 @@ README.md       # Project documentation
 ## 📝 Credits & License
 
 - **Data:** Kaggle F1 Dataset, Ergast API, Wikipedia (for post-2024 manual updates)
-- **Logo & graphics:** by Francesco Saviano
+- **Designed and developed by:** by Francesco Saviano
 - **Dashboard code:** MIT License
 
 **Attribution is not required, but if you find this project useful and decide to use or share its content, please consider crediting [F1 Dashboards](https://f1dashboards.com) and Francesco Saviano. Your support helps keep the project open and growing!**
