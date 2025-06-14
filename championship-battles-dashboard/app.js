@@ -15,6 +15,7 @@ let resultsData = [];
 let driversMap = {};
 let constructorsMap = {};
 let driverStandingsData = [];
+let constructorStandingsData = [];
 let qualifyingData = [];
 
 // State management
@@ -30,6 +31,7 @@ const CSV_FILES = {
     drivers: 'drivers.csv',
     constructors: 'constructors.csv',
     driverStandings: 'driver_standings.csv',
+    constructorStandings: 'constructor_standings.csv',
     qualifying: 'qualifying.csv'
 };
 
@@ -104,13 +106,14 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 async function loadAllData() {
     try {
-        const [races, results, drivers, constructors, driverStandings, qualifying] = 
+        const [races, results, drivers, constructors, driverStandings, constructorStandings, qualifying] = 
             await Promise.all([
                 loadCSV(CSV_FILES.races),
                 loadCSV(CSV_FILES.results),
                 loadCSV(CSV_FILES.drivers),
                 loadCSV(CSV_FILES.constructors),
                 loadCSV(CSV_FILES.driverStandings),
+                loadCSV(CSV_FILES.constructorStandings),
                 loadCSV(CSV_FILES.qualifying)
             ]);
         
@@ -120,6 +123,7 @@ async function loadAllData() {
         processDriversData(drivers);
         processConstructorsData(constructors);
         driverStandingsData = driverStandings;
+        constructorStandingsData = constructorStandings;
         qualifyingData = qualifying;
         
     } catch (error) {
@@ -1214,54 +1218,88 @@ function updateFinalStandings(battleData) {
         driversBody.innerHTML = '<tr><td colspan="5" class="no-data">No data available</td></tr>';
     }
     
-    // Calculate constructor standings manually (Top 5)
-    const constructorPoints = {};
-    const constructorWins = {};
-    
-    // Sum up points for each constructor
-    yearRaces.forEach(race => {
-        const raceResults = resultsData.filter(r => r.raceId === race.raceId);
-        
-        raceResults.forEach(result => {
-            if (result.constructorId && result.points > 0) {
-                constructorPoints[result.constructorId] = 
-                    (constructorPoints[result.constructorId] || 0) + result.points;
-            }
-            
-            if (result.constructorId && result.position === 1) {
-                constructorWins[result.constructorId] = 
-                    (constructorWins[result.constructorId] || 0) + 1;
-            }
-        });
-    });
-    
-    // Special handling for 2007 - McLaren disqualification
-    if (currentYear === 2007) {
-        // Find McLaren's constructorId
-        const mclaren = Object.values(constructorsMap).find(c => 
-            c.name.toLowerCase().includes('mclaren')
-        );
-        
-        if (mclaren) {
-            // Remove McLaren's constructor points but keep their wins
-            delete constructorPoints[mclaren.id];
-        }
-    }
-    
-    // Convert to array and sort
-    const constructorStandings = Object.entries(constructorPoints)
-        .map(([constructorId, points]) => ({
-            constructorId: parseInt(constructorId),
-            points: points,
-            wins: constructorWins[constructorId] || 0
-        }))
-        .sort((a, b) => b.points - a.points)
-        .slice(0, 5);
+    // Update constructors standings
+    const finalConstructorStandings = constructorStandingsData
+        .filter(s => s.raceId == lastRace.raceId)
+        .sort((a, b) => (a.position || 999) - (b.position || 999));
     
     const constructorsBody = document.getElementById('constructorsStandingsBody');
     constructorsBody.innerHTML = '';
     
-    if (constructorStandings.length > 0) {
+    // Check if we have official standings data
+    if (finalConstructorStandings.length > 0 && currentYear !== 2007) {
+        // Use official standings
+        finalConstructorStandings.slice(0, 5).forEach((standing, index) => {
+            const constructor = constructorsMap[standing.constructorId];
+            if (!constructor) return;
+            
+            // Count wins for this constructor
+            const wins = resultsData.filter(r => 
+                r.constructorId == standing.constructorId &&
+                r.position == 1 &&
+                yearRaces.some(race => race.raceId == r.raceId)
+            ).length;
+            
+            const teamColor = getTeamColor(constructor.ref);
+            const tr = document.createElement('tr');
+            const positionClass = index === 0 ? 'position-1' : 
+                                index === 1 ? 'position-2' : 
+                                index === 2 ? 'position-3' : '';
+            
+            tr.innerHTML = `
+                <td class="${positionClass}">${standing.position || index + 1}</td>
+                <td style="color: ${teamColor}">${constructor.name}</td>
+                <td>${standing.points || 0}</td>
+                <td>${wins}</td>
+            `;
+            
+            constructorsBody.appendChild(tr);
+        });
+    } else {
+        // Manual calculation for years without official data or 2007
+        const constructorPoints = {};
+        const constructorWins = {};
+        
+        // Sum up points for each constructor
+        yearRaces.forEach(race => {
+            const raceResults = resultsData.filter(r => r.raceId == race.raceId);
+            
+            raceResults.forEach(result => {
+                if (result.constructorId && result.points > 0) {
+                    constructorPoints[result.constructorId] = 
+                        (constructorPoints[result.constructorId] || 0) + result.points;
+                }
+                
+                if (result.constructorId && result.position == 1) {
+                    constructorWins[result.constructorId] = 
+                        (constructorWins[result.constructorId] || 0) + 1;
+                }
+            });
+        });
+        
+        // Special handling for 2007 - McLaren disqualification
+        if (currentYear === 2007) {
+            // Find McLaren's constructorId
+            const mclaren = Object.values(constructorsMap).find(c => 
+                c.name.toLowerCase().includes('mclaren')
+            );
+            
+            if (mclaren) {
+                // Remove McLaren's constructor points
+                delete constructorPoints[mclaren.id];
+            }
+        }
+        
+        // Convert to array and sort
+        const constructorStandings = Object.entries(constructorPoints)
+            .map(([constructorId, points]) => ({
+                constructorId: parseInt(constructorId),
+                points: points,
+                wins: constructorWins[constructorId] || 0
+            }))
+            .sort((a, b) => b.points - a.points)
+            .slice(0, 5);
+        
         constructorStandings.forEach((standing, index) => {
             const constructor = constructorsMap[standing.constructorId];
             if (!constructor) return;
@@ -1281,19 +1319,17 @@ function updateFinalStandings(battleData) {
             
             constructorsBody.appendChild(tr);
         });
-        
-        // Add note for 2007
-        if (currentYear === 2007) {
-            const noteRow = document.createElement('tr');
-            noteRow.innerHTML = `
-                <td colspan="4" style="text-align: center; font-style: italic; color: var(--text-secondary); padding-top: 1rem;">
-                    McLaren was excluded from the Constructors' Championship
-                </td>
-            `;
-            constructorsBody.appendChild(noteRow);
-        }
-    } else {
-        constructorsBody.innerHTML = '<tr><td colspan="4" class="no-data">No data available</td></tr>';
+    }
+    
+    // Add note for 2007
+    if (currentYear === 2007) {
+        const noteRow = document.createElement('tr');
+        noteRow.innerHTML = `
+            <td colspan="4" style="text-align: center; font-style: italic; color: var(--text-secondary); padding-top: 1rem;">
+                McLaren was excluded from the Constructors' Championship
+            </td>
+        `;
+        constructorsBody.appendChild(noteRow);
     }
 }
 
