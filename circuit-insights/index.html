@@ -1,1 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circuit Insights - F1Dashboards</title>
+    <meta name="description" content="Explore detailed statistics and historical data for every Formula 1 circuit. Discover track records, winners, and racing insights.">
+    <meta name="keywords" content="F1 circuits, Formula 1 tracks, circuit statistics, track records, F1 venues, Grand Prix circuits, racing data" />
+    
+    <link rel="canonical" href="https://f1dashboards.com/dashboards/circuit-insights/" />
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Plotly.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.27.0/plotly.min.js"></script>
+    <script>
+      // If the Plotly CDN fails, load the local version as a fallback
+      if (typeof Plotly === "undefined") {
+        var script = document.createElement("script");
+        script.src = "libs/plotly.min.js";
+        document.head.appendChild(script);
+      }
+    </script>
 
+    <!-- PapaParse CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script>
+      // If the PapaParse CDN fails, load the local version as a fallback
+      if (typeof Papa === "undefined") {
+        var script = document.createElement("script");
+        script.src = "libs/papaparse.min.js";
+        document.head.appendChild(script);
+      }
+    </script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loader" id="loader">
+        <div class="loader-content">
+            <div class="loader-circle"></div>
+            <p class="loader-text">Loading Circuit Data...</p>
+        </div>
+    </div>
+    
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <nav class="nav-menu">
+                <a href="/" class="home-icon" title="Home">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                </a>
+                
+                <div class="nav-links">
+                    <a href="https://f1dashboards.com/dashboards/constructor-standings-dashboard/" class="nav-link">Constructors</a>
+                    <a href="https://f1dashboards.com/dashboards/drivers-career-dashboard/" class="nav-link">Drivers</a>
+                    <a href="https://f1dashboards.com/dashboards/race-results-explorer/" class="nav-link">Races</a>
+                    <a href="https://f1dashboards.com/dashboards/qualifying-performance-dashboard/" class="nav-link">Qualifying</a>
+                    <a href="https://f1dashboards.com/dashboards/championship-battles-dashboard/" class="nav-link">Battles</a>
+                    <a href="https://f1dashboards.com/dashboards/circuit-insights/" class="nav-link active">Circuits</a>
+                </div>
+                
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </nav>
+            
+            <a href="/" class="logo">F1 Dashboards</a>
+        </div>
+    </header>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-content">
+            <a href="https://f1dashboards.com/dashboards/constructor-standings-dashboard/" class="mobile-menu-link">Constructors</a>
+            <a href="https://f1dashboards.com/dashboards/drivers-career-dashboard/" class="mobile-menu-link">Drivers</a>
+            <a href="https://f1dashboards.com/dashboards/race-results-explorer/" class="mobile-menu-link">Races</a>
+            <a href="https://f1dashboards.com/dashboards/qualifying-performance-dashboard/" class="mobile-menu-link">Qualifying</a>
+            <a href="https://f1dashboards.com/dashboards/championship-battles-dashboard/" class="mobile-menu-link">Battles</a>
+            <a href="https://f1dashboards.com/dashboards/circuit-insights/" class="mobile-menu-link active">Circuits</a>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <h1>Circuit Insights</h1>
+            <p>Explore comprehensive statistics and historical data for every Formula 1 circuit. Discover track records, dominant winners, lap time evolution, and fascinating insights from decades of racing history.</p>
+        </div>
+        
+        <!-- Circuits List View -->
+        <div id="circuitsListView">
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="filter-controls">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Search circuits..." autocomplete="off">
+                        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </div>
+                    
+                    <select id="continentFilter" class="filter-select">
+                        <option value="">All Continents</option>
+                        <option value="Europe">Europe</option>
+                        <option value="Asia">Asia</option>
+                        <option value="Americas">Americas</option>
+                        <option value="Oceania">Oceania</option>
+                        <option value="Africa">Africa</option>
+                    </select>
+                    
+                    <select id="sortBy" class="filter-select">
+                        <option value="name">Sort by Name</option>
+                        <option value="races">Most Races</option>
+                        <option value="recent">Most Recent</option>
+                        <option value="oldest">Oldest First</option>
+                    </select>
+                </div>
+                
+                <div class="filter-stats">
+                    <span id="circuitCount">0 circuits</span>
+                </div>
+            </div>
+            
+            <!-- Circuits Grid -->
+            <div class="circuits-grid" id="circuitsGrid">
+                <!-- Circuit cards will be populated here -->
+            </div>
+        </div>
+        
+        <!-- Circuit Detail View -->
+        <div id="circuitDetailView" style="display: none;">
+            <!-- Back Button -->
+            <button class="back-btn" id="backToCircuitsBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                Back to circuits
+            </button>
+            
+            <!-- Circuit Header -->
+            <div class="circuit-header">
+                <h2 id="circuitName">Circuit Name</h2>
+                <div class="circuit-location">
+                    <span id="circuitLocation">Location</span>
+                    <span class="separator">•</span>
+                    <span id="circuitCountry">Country</span>
+                </div>
+            </div>
+            
+            <!-- Circuit Info Cards -->
+            <div class="circuit-info-grid">
+                <div class="info-card">
+                    <h4>First Grand Prix</h4>
+                    <p class="info-value" id="firstGP">-</p>
+                </div>
+                <div class="info-card">
+                    <h4>Total Races</h4>
+                    <p class="info-value" id="totalRaces">-</p>
+                </div>
+                <div class="info-card">
+                    <h4>Last Race</h4>
+                    <p class="info-value" id="lastRace">-</p>
+                </div>
+                <div class="info-card">
+                    <h4>Track Length</h4>
+                    <p class="info-value" id="trackLength">-</p>
+                </div>
+            </div>
+            
+            <!-- Records Section -->
+            <div class="records-section">
+                <h3>Circuit Records</h3>
+                <div class="records-grid">
+                    <div class="record-card">
+                        <h4>Fastest Lap</h4>
+                        <div class="record-info">
+                            <p class="record-time" id="fastestLapTime">-</p>
+                            <p class="record-holder" id="fastestLapHolder">-</p>
+                            <p class="record-year" id="fastestLapYear">-</p>
+                        </div>
+                    </div>
+                    <div class="record-card">
+                        <h4>Most Wins</h4>
+                        <div class="record-info">
+                            <p class="record-value" id="mostWinsCount">-</p>
+                            <p class="record-holder" id="mostWinsDriver">-</p>
+                        </div>
+                    </div>
+                    <div class="record-card">
+                        <h4>Most Poles</h4>
+                        <div class="record-info">
+                            <p class="record-value" id="mostPolesCount">-</p>
+                            <p class="record-holder" id="mostPolesDriver">-</p>
+                        </div>
+                    </div>
+                    <div class="record-card">
+                        <h4>Constructor Wins</h4>
+                        <div class="record-info">
+                            <p class="record-value" id="constructorWinsCount">-</p>
+                            <p class="record-holder" id="constructorWinsTeam">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Winners Distribution -->
+            <div class="chart-section">
+                <h3>Winners at this Circuit</h3>
+                <div class="chart-card">
+                    <div id="winnersChart" class="plotly-chart"></div>
+                </div>
+            </div>
+            
+            <!-- Lap Time Evolution -->
+            <div class="chart-section">
+                <h3>Lap Time Evolution</h3>
+                <div class="chart-card">
+                    <div id="lapTimeChart" class="plotly-chart"></div>
+                </div>
+            </div>
+            
+            <!-- Recent Results -->
+            <div class="recent-results-section">
+                <h3>Recent Race Results</h3>
+                <div class="table-wrapper">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Year</th>
+                                <th>Winner</th>
+                                <th>Constructor</th>
+                                <th>Pole</th>
+                                <th>Fastest Lap</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentResultsBody">
+                            <tr>
+                                <td colspan="5" class="no-data">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <p>Powered by <a href="https://plotly.com/javascript/" target="_blank">Plotly.js</a> • Designed and developed by <a href="https://f1dashboards.com/about#author" target="_blank">Francesco Saviano</a></p>
+            <p>Data © <a href="https://www.kaggle.com/rohanrao" target="_blank">Rohan Rao</a> (<a href="https://www.kaggle.com/datasets/rohanrao/formula-1-world-championship-1950-2020" target="_blank">Kaggle: vopani</a>) – Based on the <a href="http://ergast.com/mrd/" target="_blank">Ergast Developer API</a></p>
+            <p>© 2025 F1Dashboards.com. Made with ❤️ for F1 fans.</p>
+        </div>
+    </footer>
+    
+    <!-- Custom JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>
