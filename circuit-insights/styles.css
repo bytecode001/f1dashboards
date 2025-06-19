@@ -16,6 +16,11 @@
     --permanent-circuit: #00D2BE;
     --hybrid-circuit: #0090FF;
     
+    /* Position Colors */
+    --gold: #FFD700;
+    --silver: #C0C0C0;
+    --bronze: #CD7F32;
+    
     /* Spacing and Layout */
     --border-radius: 12px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -78,299 +83,10 @@ body {
     font-size: 0.875rem;
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin-bottom: 1rem;
-}
-
-.record-info {
-    text-align: center;
-}
-
-.record-time,
-.record-value {
-    font-family: 'Russo One', sans-serif;
-    font-size: 2rem;
-    color: var(--accent);
-    margin-bottom: 0.5rem;
-}
-
-.record-holder {
-    color: var(--text-primary);
-    font-weight: 600;
-    font-size: 1.1rem;
-}
-
-.record-year {
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
-}
-
-/* Chart Sections */
-.chart-section {
-    margin-bottom: 3rem;
-}
-
-.chart-section h3 {
-    font-family: 'Russo One', sans-serif;
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-}
-
-.chart-card {
-    background-color: var(--card-bg);
-    padding: 2rem;
-    border-radius: var(--border-radius);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--border-color);
-}
-
-.plotly-chart {
-    width: 100%;
-    height: 400px;
-}
-
-/* Recent Results Section */
-.recent-results-section {
-    margin-bottom: 3rem;
-}
-
-.recent-results-section h3 {
-    font-family: 'Russo One', sans-serif;
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-}
-
-.table-wrapper {
-    background-color: var(--card-bg);
-    padding: 1.5rem;
-    border-radius: var(--border-radius);
-    overflow-x: auto;
-    border: 1px solid var(--border-color);
-}
-
-.results-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 600px;
-}
-
-.results-table th {
-    text-align: left;
-    padding: 1rem;
-    border-bottom: 2px solid var(--accent);
-    font-weight: 600;
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.results-table td {
-    padding: 1rem;
-    border-bottom: 1px solid var(--border-color);
-    transition: var(--transition);
-}
-
-.results-table tr:hover td {
-    background-color: rgba(255, 24, 1, 0.05);
-}
-
-.no-data {
-    text-align: center;
-    color: var(--text-secondary);
-    padding: 3rem !important;
-}
-
-/* Animations */
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-.fade-in {
-    animation: fadeIn 0.3s ease-out;
-}
-
-/* Footer */
-footer {
-    background-color: var(--secondary-bg);
-    padding: 2rem 0;
-    margin-top: 4rem;
-    text-align: center;
-}
-
-.footer-content {
-    max-width: var(--container-width);
-    margin: 0 auto;
-    padding: 0 2rem;
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-}
-
-.footer-content p {
-    margin: 0.5rem 0;
-}
-
-.footer-content a {
-    color: var(--accent);
-    text-decoration: none;
-    transition: opacity 0.3s;
-}
-
-.footer-content a:hover {
-    opacity: 0.8;
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--secondary-bg);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--accent);
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--accent-hover);
-}
-
-/* Responsive Design */
-@media (max-width: 1024px) {
-    .nav-links {
-        gap: 1rem;
-    }
-    
-    .nav-link {
-        font-size: 0.9rem;
-        padding: 0.5rem 0.75rem;
-    }
-    
-    .circuits-grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    }
-}
-
-@media (max-width: 768px) {
-    .header-container {
-        padding: 1rem;
-    }
-    
-    .nav-links {
-        display: none;
-    }
-    
-    .mobile-menu-toggle {
-        display: flex;
-    }
-    
-    .nav-menu {
-        gap: 1rem;
-    }
-    
-    header {
-        height: auto;
-    }
-    
-    .logo {
-        font-size: 1.5rem;
-    }
-    
-    .home-icon {
-        padding: 0.75rem;
-    }
-    
-    .hero-section h1 {
-        font-size: 2rem;
-    }
-    
-    .hero-section p {
-        font-size: 1rem;
-        padding: 0 1rem;
-    }
-    
-    .main-container {
-        padding: 1rem;
-    }
-    
-    .filter-controls {
-        flex-direction: column;
-    }
-    
-    .search-box {
-        min-width: 100%;
-    }
-    
-    .filter-select {
-        width: 100%;
-    }
-    
-    .circuits-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .circuit-header h2 {
-        font-size: 2rem;
-    }
-    
-    .circuit-info-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .records-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .plotly-chart {
-        height: 300px;
-    }
-}
-
-@media (max-width: 480px) {
-    .circuit-info-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .info-card .info-value {
-        font-size: 1.25rem;
-    }
-    
-    .record-time,
-    .record-value {
-        font-size: 1.5rem;
-    }
-}
-    text-transform: uppercase;
-    letter-spacing: 1px;
 }
 
 @keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+    to { transform: rotate(360deg); }
 }
 
 /* Header Styles */
@@ -858,3 +574,295 @@ header {
 .record-card h4 {
     color: var(--text-secondary);
     font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+}
+
+.record-info {
+    text-align: center;
+}
+
+.record-time,
+.record-value {
+    font-family: 'Russo One', sans-serif;
+    font-size: 2rem;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+}
+
+.record-holder {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.record-year {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Chart Sections */
+.chart-section {
+    margin-bottom: 3rem;
+}
+
+.chart-section h3 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.chart-card {
+    background-color: var(--card-bg);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+}
+
+.plotly-chart {
+    width: 100%;
+    height: 400px;
+}
+
+/* Recent Results Section */
+.recent-results-section {
+    margin-bottom: 3rem;
+}
+
+.recent-results-section h3 {
+    font-family: 'Russo One', sans-serif;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.table-wrapper {
+    background-color: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
+}
+
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+.results-table th {
+    text-align: left;
+    padding: 1rem;
+    border-bottom: 2px solid var(--accent);
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.results-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+
+.results-table tr:hover td {
+    background-color: rgba(255, 24, 1, 0.05);
+}
+
+.no-data {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 3rem !important;
+}
+
+/* Footer */
+footer {
+    background-color: var(--secondary-bg);
+    padding: 2rem 0;
+    margin-top: 4rem;
+    text-align: center;
+}
+
+.footer-content {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 0 2rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.footer-content p {
+    margin: 0.5rem 0;
+}
+
+.footer-content a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: opacity 0.3s;
+}
+
+.footer-content a:hover {
+    opacity: 0.8;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--secondary-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-hover);
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .nav-links {
+        gap: 1rem;
+    }
+    
+    .nav-link {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .circuits-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .header-container {
+        padding: 1rem;
+    }
+    
+    .nav-links {
+        display: none;
+    }
+    
+    .mobile-menu-toggle {
+        display: flex;
+    }
+    
+    .nav-menu {
+        gap: 1rem;
+    }
+    
+    header {
+        height: auto;
+    }
+    
+    .logo {
+        font-size: 1.5rem;
+    }
+    
+    .home-icon {
+        padding: 0.75rem;
+    }
+    
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+    
+    .hero-section p {
+        font-size: 1rem;
+        padding: 0 1rem;
+    }
+    
+    .main-container {
+        padding: 1rem;
+    }
+    
+    .filter-controls {
+        flex-direction: column;
+    }
+    
+    .search-box {
+        min-width: 100%;
+    }
+    
+    .filter-select {
+        width: 100%;
+    }
+    
+    .circuits-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .circuit-header h2 {
+        font-size: 2rem;
+    }
+    
+    .circuit-info-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .records-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .plotly-chart {
+        height: 300px;
+    }
+    
+    .table-wrapper {
+        max-height: 400px;
+    }
+    
+    .standings-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .circuit-info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .info-card .info-value {
+        font-size: 1.25rem;
+    }
+    
+    .record-time,
+    .record-value {
+        font-size: 1.5rem;
+    }
+}
